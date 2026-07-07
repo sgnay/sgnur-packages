@@ -19,6 +19,6 @@
   # flakeModules = { }; # flake-parts modules
   overlays = import ./overlays; # nixpkgs overlays
 
-  univpn = pkgs.callPackage ./pkgs/univpn { };  # Leagsoft UniVPN 客户端
+  univpn = pkgs.callPackage ./pkgs/univpn { zipFile = ./pkgs/univpn/univpn-linux-64-10781.19.0.1214.zip; };  # Leagsoft UniVPN 客户端
   # ...
 }
