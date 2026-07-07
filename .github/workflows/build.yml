@@ -21,7 +21,7 @@ jobs:
         # The repo name as used in
         # https://github.com/nix-community/NUR/blob/master/repos.json
         nurRepo:
-          - <YOUR_REPO_NAME>
+          - sgnur-packages
         # Set this to cache your build results in cachix for faster builds
         # in CI and for everyone who uses your cache.
         #
@@ -32,8 +32,10 @@ jobs:
         # CACHIX_AUTH_TOKEN secret in your repository secrets settings in
         # Github found at
         # https://github.com/<your_githubname>/nur-packages/settings/secrets
+        # 如果你有 Cachix 缓存，在这里填写缓存名（不含 .cachix.org 后缀）
+        # 同时需要在 GitHub Secrets 中设置 CACHIX_SIGNING_KEY 或 CACHIX_AUTH_TOKEN
         cachixName:
-          - <YOUR_CACHIX_NAME>
+          - unused
         nixPath:
           - nixpkgs=https://github.com/NixOS/nixpkgs/archive/refs/heads/nixpkgs-unstable.tar.gz
           - nixpkgs=https://github.com/NixOS/nixpkgs/archive/refs/heads/nixos-unstable.tar.gz
@@ -53,8 +55,7 @@ jobs:
       run: nix-instantiate --eval -E '(import <nixpkgs> {}).lib.version'
     - name: Setup cachix
       uses: cachix/cachix-action@v16
-      # Don't replace <YOUR_CACHIX_NAME> here!
-      if: ${{ matrix.cachixName != '<YOUR_CACHIX_NAME>' }}
+      if: ${{ matrix.cachixName != 'unused' }}
       with:
         name: ${{ matrix.cachixName }}
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
@@ -71,6 +72,5 @@ jobs:
     - name: Build nix packages
       run: nix shell -f '<nixpkgs>' nix-build-uncached -c nix-build-uncached ci.nix -A cacheOutputs
     - name: Trigger NUR update
-      # Don't replace <YOUR_REPO_NAME> here!
-      if: ${{ matrix.nurRepo != '<YOUR_REPO_NAME>' }}
+      if: ${{ matrix.nurRepo != '' }}
       run: curl -XPOST "https://nur-update.nix-community.org/update?repo=${{ matrix.nurRepo }}"

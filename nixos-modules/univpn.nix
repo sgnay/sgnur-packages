@@ -3,17 +3,8 @@ with lib;
 let
   cfg = config.services.univpn;
 
-  # ── 从本地 zip 中提取 UniVPN ──────────────────────────
-  univpn = pkgs.runCommand "univpn-10781.19.0.1214" {
-    nativeBuildInputs = [ pkgs.unzip pkgs.gzip pkgs.binutils ];
-  } ''
-    unzip -qo ${./../../etc/nixos/pkgs/univpn-linux-64-10781.19.0.1214.zip}
-    tail -n +258 univpn-linux-amd64-10781.19.0.1214.run > UniVPN.tar.gz
-    mkdir -p $out
-    tar -xzf UniVPN.tar.gz -C $out
-    chmod +x $out/UniVPN $out/serviceclient/UniVPNCS $out/promote/UniVPNPromoteService $out/UniVPNUpdate
-    mkdir -p $out/certificate
-  '';
+  # ── 使用 pkgs 中的 univpn 包（由 default.nix 加载） ──
+  univpn = pkgs.univpn;
 
   # ── Nixpkgs Qt5 路径 ────────────────────────────────
   qt5lib = pkgs.qt5.qtbase.out;
@@ -42,7 +33,7 @@ let
   wrapper = pkgs.writeShellApplication {
     name = "univpn";
     text = ''
-      export LD_LIBRARY_PATH="${libPath}$${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH"
+      export LD_LIBRARY_PATH="${libPath}$''${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH"
       export QT_PLUGIN_PATH="${qt5lib}/plugins"
       cd /usr/local/UniVPN
       exec /usr/local/UniVPN/UniVPN "$@"

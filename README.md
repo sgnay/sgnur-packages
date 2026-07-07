@@ -1,37 +1,92 @@
-# nur-packages-template
+# sgnur-packages
 
-**A template for [NUR](https://github.com/nix-community/NUR) repositories**
+**sgnay 的个人 [NUR](https://github.com/nix-community/NUR) 仓库**
 
-## Setup
+![Build and populate cache](https://github.com/sgnay/sgnur-packages/workflows/Build%20and%20populate%20cache/badge.svg)
 
-1. Click on [Use this template](https://github.com/nix-community/nur-packages-template/generate) to start a repo based on this template. (Do _not_ fork it.)
-2. Add your packages to the [pkgs](./pkgs) directory and to
-   [default.nix](./default.nix)
-   * Remember to mark the broken packages as `broken = true;` in the `meta`
-     attribute, or travis (and consequently caching) will fail!
-   * Library functions, modules and overlays go in the respective directories
-3. Choose your CI: Depending on your preference you can use github actions (recommended) or [Travis ci](https://travis-ci.com).
-   - Github actions: Change your NUR repo name and optionally add a cachix name in [.github/workflows/build.yml](./.github/workflows/build.yml) and change the cron timer
-     to a random value as described in the file
-   - Travis ci: Change your NUR repo name and optionally your cachix repo name in 
-   [.travis.yml](./.travis.yml). Than enable travis in your repo. You can add a cron job in the repository settings on travis to keep your cachix cache fresh
-5. Change your travis and cachix names on the README template section and delete
-   the rest
-6. [Add yourself to NUR](https://github.com/nix-community/NUR#how-to-add-your-own-repository)
+## 包含的包
 
-## README template
+| 包名 | 描述 | 状态 |
+|---|---|---|
+| `univpn` | Leagsoft UniVPN 客户端 | ✅ 可用 |
+| `univpn-nixos-module` | UniVPN NixOS 模块（`services.univpn.enable`） | ✅ 可用 |
 
-# nur-packages
+## 使用方式
 
-**My personal [NUR](https://github.com/nix-community/NUR) repository**
+### 通过 Flake
 
-<!-- Remove this if you don't use github actions -->
-![Build and populate cache](https://github.com/<YOUR-GITHUB-USER>/nur-packages/workflows/Build%20and%20populate%20cache/badge.svg)
+在 `flake.nix` 中添加输入：
 
-<!--
-Uncomment this if you use travis:
+```nix
+{
+  inputs.sgnur-packages.url = "github:sgnay/sgnur-packages";
+}
+```
 
-[![Build Status](https://travis-ci.com/<YOUR_TRAVIS_USERNAME>/nur-packages.svg?branch=master)](https://travis-ci.com/<YOUR_TRAVIS_USERNAME>/nur-packages)
--->
-[![Cachix Cache](https://img.shields.io/badge/cachix-<YOUR_CACHIX_CACHE_NAME>-blue.svg)](https://<YOUR_CACHIX_CACHE_NAME>.cachix.org)
+#### 运行 UniVPN
 
+```bash
+nix run github:sgnay/sgnur-packages#univpn
+```
+
+#### 作为 NixOS 模块启用
+
+```nix
+{
+  imports = [ inputs.sgnur-packages.nixosModules.univpn ];
+  services.univpn.enable = true;
+}
+```
+
+### 通过 NUR
+
+如果你已配置 [NUR](https://github.com/nix-community/NUR)：
+
+```nix
+{ pkgs, ... }:
+{
+  programs.univpn.enable = true;  # 假想，实际请参考模块配置
+}
+```
+
+### 通过 Overlay
+
+```nix
+{ config, pkgs, ... }:
+let
+  overlays = [ (import ./overlay.nix) ];
+  pkgs' = import <nixpkgs> { inherit overlays; };
+in {
+  environment.systemPackages = [ pkgs'.univpn ];
+}
+```
+
+## 开发
+
+```bash
+# 构建所有包
+nix-build -A univpn
+
+# 检查评估
+nix-env -f . -qa \* --meta --xml --drv-path --show-trace
+```
+
+## 项目结构
+
+```
+.
+├── flake.nix              # Flake 入口
+├── default.nix            # 包集合入口
+├── overlay.nix            # nixpkgs overlay
+├── ci.nix                 # CI 构建定义
+├── pkgs/
+│   └── univpn/            # UniVPN 包
+├── nixos-modules/
+│   └── univpn.nix         # UniVPN NixOS 模块
+├── lib/                   # 库函数
+└── overlays/              # Overlays
+```
+
+## 许可
+
+MIT License — 本仓库基于 [nur-packages-template](https://github.com/nix-community/nur-packages-template)（Copyright (c) 2018 Francesco Gazzetta）。

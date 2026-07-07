@@ -19,6 +19,6 @@
   # flakeModules = { }; # flake-parts modules
   overlays = import ./overlays; # nixpkgs overlays
 
-  # some-qt5-package = pkgs.libsForQt5.callPackage ./pkgs/some-qt5-package { };
+  univpn = pkgs.callPackage ./pkgs/univpn { };  # Leagsoft UniVPN 客户端
   # ...
 }
