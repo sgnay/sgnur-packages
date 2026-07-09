@@ -11,6 +11,7 @@
 | `univpn` | Leagsoft UniVPN 客户端 | ✅ 可用 |
 | `univpn-nixos-module` | UniVPN NixOS 模块（`services.univpn.enable`） | ✅ 可用 |
 | `nyaterm` | [NyaTerm](https://nyaterm.app) — 现代远程终端工作区（SSH / SFTP / Telnet / Serial） | ✅ 可用 |
+| `nyaterm.desktop` | NyaTerm 桌面入口文件（含图标，可从应用菜单启动） | ✅ 自动安装 |
 
 ## 使用方式
 
@@ -88,6 +89,9 @@ nix-env -f . -qa \* --meta --xml --drv-path --show-trace
 ├── pkgs/
 │   ├── univpn/            # UniVPN 包
 │   └── nyaterm/           # NyaTerm 包
+│       ├── default.nix    # 包定义
+│       ├── Cargo.lock     # Rust 依赖锁定（882 个 crate）
+│       └── nyaterm.desktop.in  # 桌面入口模板
 ├── nixos-modules/
 │   └── univpn.nix         # UniVPN NixOS 模块
 ├── lib/                   # 库函数

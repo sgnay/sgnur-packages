@@ -23,7 +23,8 @@ sgnur-packages/
 │   │   └── univpn-linux-64-10781.19.0.1214.zip
 │   └── nyaterm/               # NyaTerm — 现代远程终端工作区
 │       ├── default.nix
-│       └── Cargo.lock
+│       ├── Cargo.lock
+│       └── nyaterm.desktop.in
 ├── nixos-modules/
 │   ├── default.nix            # NixOS 模块集合
 │   └── univpn.nix             # UniVPN NixOS 模块（使用 pkgs.univpn）
@@ -66,11 +67,14 @@ sgnur-packages/
   2. `pnpmConfigHook` 在 configure 阶段安装 node_modules
   3. `preBuild` 运行 `pnpm build` 构建前端 → 生成 `dist/`
   4. `buildRustPackage` + `cargoLock.lockFile` 编译 Rust 后端
-- **系统依赖** (buildInputs): `webkitgtk_4_1`, `libsoup_3`, `gtk3`, `glib`, `cairo`, `gdk-pixbuf`, `pango`, `atk`, `libxcb`, `libx11`, `libxkbcommon`, `freetype`, `fontconfig`, `dbus`, `openssl`, `zlib`, `brotli`, `libappindicator-gtk3`, `librsvg`, `udev`
+- **系统依赖** (buildInputs): `webkitgtk_4_1`, `libsoup_3`, `gtk3`, `glib`, `cairo`, `gdk-pixbuf`, `pango`, `atk`, `libxcb`, `libx11`, `libxkbcommon`, `freetype`, `fontconfig`, `dbus`, `openssl`, `zlib`, `brotli`, `libappindicator-gtk3`, `librsvg`, `udev`, `gsettings-desktop-schemas`
 - **特殊处理**:
   - `doCheck = false` — 沙箱中并发数据库访问导致测试失败
   - `cargoLock.lockFile = ./Cargo.lock` — Cargo.lock 从上游复制到包目录
   - 使用 `buildAndTestSubdir = "src-tauri"` 确保 cargo 在正确的目录构建
+  - `postPatch` 添加 `custom-protocol` feature — 使 app 使用内嵌前端资源而非 dev server URL
+  - `wrapProgram` 设置 `GDK_BACKEND=x11` — 改善 Wayland 下字体渲染
+  - 安装 `.desktop` 文件 + 256x256 图标 — 可从桌面环境启动
 - **注册**: `default.nix` → `pkgs.callPackage ./pkgs/nyaterm { }`
 
 ### 4. CI 流水线 (`.github/workflows/build.yml`)
@@ -116,6 +120,9 @@ nix-build -A nyaterm
 | 注册 univpn 到 default.nix | ✅ | 通过 `pkgs.callPackage` 加载 |
 | 重写 README.md | ✅ | 替换为项目真实描述 |
 | 打包 nyaterm | ✅ | NyaTerm — 现代远程终端工作区 |
+| nyaterm .desktop 文件 | ✅ | 含图标，可从桌面启动器打开 |
+| nyaterm custom-protocol | ✅ | 修复空窗口问题（使用内嵌前端资源） |
+| nyaterm 字体渲染 | ✅ | 设置 GDK_BACKEND=x11 改善模糊问题 |
 
 ## 后续建议
 
