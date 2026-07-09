@@ -74,6 +74,7 @@ rustPlatform.buildRustPackage {
     pkgs.libappindicator-gtk3
     pkgs.librsvg
     pkgs.udev
+    pkgs.gsettings-desktop-schemas
   ];
 
   # Skip tests — they fail in sandbox due to concurrent DB access
@@ -119,7 +120,8 @@ rustPlatform.buildRustPackage {
         libappindicator-gtk3
         librsvg
         udev
-      ])}
+      ])} \
+      --set-default GDK_BACKEND x11
 
     # Install icon
     mkdir -p $out/share/icons/hicolor/256x256/apps
