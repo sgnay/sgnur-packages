@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=NyaTerm
+GenericName=Remote Terminal Workspace
+Comment=A modern remote terminal workspace for SSH, SFTP, Telnet, Serial, and more
+Exec=@out@/bin/nyaterm
+Icon=nyaterm
+Terminal=false
+Categories=Network;RemoteAccess;TerminalEmulator;
+StartupWMClass=nyaterm
+StartupNotify=true
+Keywords=ssh;sftp;telnet;serial;terminal;

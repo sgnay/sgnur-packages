@@ -79,6 +79,13 @@ rustPlatform.buildRustPackage {
   # Skip tests — they fail in sandbox due to concurrent DB access
   doCheck = false;
 
+  # Patch Cargo.toml to enable custom-protocol feature, which makes
+  # the app use embedded frontend assets instead of dev server URL
+  postPatch = ''
+    substituteInPlace src-tauri/Cargo.toml \
+      --replace-fail 'tauri = { version = "2", features = [' 'tauri = { version = "2", features = ["custom-protocol", '
+  '';
+
   # Build frontend (pnpm) then Rust backend
   # pnpmConfigHook already ran pnpm install in configurePhase,
   # so node_modules is ready at the source root.
@@ -113,6 +120,16 @@ rustPlatform.buildRustPackage {
         librsvg
         udev
       ])}
+
+    # Install icon
+    mkdir -p $out/share/icons/hicolor/256x256/apps
+    cp ${src}/src-tauri/icons/icon.png $out/share/icons/hicolor/256x256/apps/nyaterm.png
+
+    # Install desktop entry
+    mkdir -p $out/share/applications
+    cp ${./nyaterm.desktop.in} $out/share/applications/nyaterm.desktop
+    substituteInPlace $out/share/applications/nyaterm.desktop \
+      --replace '@out@' "$out"
   '';
 
   meta = with lib; {
