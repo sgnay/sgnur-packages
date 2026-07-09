@@ -20,5 +20,6 @@
   overlays = import ./overlays; # nixpkgs overlays
 
   univpn = pkgs.callPackage ./pkgs/univpn { zipFile = ./pkgs/univpn/univpn-linux-64-10781.19.0.1214.zip; };  # Leagsoft UniVPN 客户端
-  # ...
+
+  nyaterm = pkgs.callPackage ./pkgs/nyaterm { };  # NyaTerm — modern remote terminal workspace
 }
