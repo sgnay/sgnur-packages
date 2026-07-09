@@ -121,7 +121,8 @@ rustPlatform.buildRustPackage {
         librsvg
         udev
       ])} \
-      --set-default GDK_BACKEND x11
+      --set-default GDK_BACKEND x11 \
+      --prefix XDG_DATA_DIRS : ${pkgs.gtk3}/share/gsettings-schemas/gtk+3-${pkgs.gtk3.version}:${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/gsettings-desktop-schemas-${pkgs.gsettings-desktop-schemas.version}
 
     # Install icon
     mkdir -p $out/share/icons/hicolor/256x256/apps
