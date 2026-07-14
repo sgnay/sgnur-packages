@@ -24,4 +24,6 @@
   nyaterm = pkgs.callPackage ./pkgs/nyaterm { };  # NyaTerm — modern remote terminal workspace
 
   omp = pkgs.callPackage ./pkgs/omp { };  # Oh My Pi — terminal coding agent
+
+  sunloginclient = pkgs.callPackage ./pkgs/sunloginclient { }; # Proprietary remote control software (AweSun / Sunlogin Client)
 }
