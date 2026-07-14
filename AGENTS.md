@@ -21,13 +21,16 @@ sgnur-packages/
 │   ├── univpn/                # UniVPN 客户端包
 │   │   ├── default.nix
 │   │   └── univpn-linux-64-10781.19.0.1214.zip
-│   └── nyaterm/               # NyaTerm — 现代远程终端工作区
-│       ├── default.nix
-│       ├── Cargo.lock
-│       └── nyaterm.desktop.in
+│   ├── nyaterm/               # NyaTerm — 现代远程终端工作区
+│   │   ├── default.nix
+│   │   ├── Cargo.lock
+│   │   └── nyaterm.desktop.in
+│   └── sunloginclient/        # 向日葵远程控制客户端 (AweSun)
+│       └── default.nix
 ├── nixos-modules/
 │   ├── default.nix            # NixOS 模块集合
-│   └── univpn.nix             # UniVPN NixOS 模块（使用 pkgs.univpn）
+│   ├── univpn.nix             # UniVPN NixOS 模块（使用 pkgs.univpn）
+│   └── sunloginclient.nix     # 向日葵远程控制 NixOS 模块
 ├── lib/
 │   └── default.nix            # 库函数（当前为空占位）
 ├── overlays/
@@ -77,7 +80,18 @@ sgnur-packages/
   - 安装 `.desktop` 文件 + 256x256 图标 — 可从桌面环境启动
 - **注册**: `default.nix` → `pkgs.callPackage ./pkgs/nyaterm { }`
 
-### 4. CI 流水线 (`.github/workflows/build.yml`)
+### 4. 向日葵远程控制客户端 (`pkgs/sunloginclient`)
+
+- **版本**: `16.5.0.30560` (AweSun / Sunlogin Client)
+- **描述**: 专有远程控制软件 (Sunlogin)
+- **构建方案 (混合打包架构)**:
+  - **GUI 启动器 (`/usr/local/awesun/awesun`) 保持原始**: 守护进程会校验 GUI 进程的二进制完整性与哈希签名（通过 `/proc/$PID/exe`）。如果使用 `autoPatchelf` 修改了 ELF 头部或剥离了 `strip`，守护进程将验证失败并不予响应，导致 GUI 卡在“正在连接服务器”。因此，此二进制保留 unmodified，并通过系统级的 `nix-ld` 配合 `NIX_LD_LIBRARY_PATH` 运行。
+  - **后台服务二进制 (`awesun_daemon` 等) 进行 `patchelf`**: 由于守护进程启动后台子进程时会清理环境变量，这会导致 `NIX_LD_LIBRARY_PATH` 丢失而无法调用 `nix-ld`（报库缺失错误如 `libgobject`）。故在安装时使用 `patchelf` 显式写入 RPATH 依赖到二进制中，使其能在 Systemd 无环境变量的干净沙箱中独立运行。
+- **依赖列表**: `stdenv.cc.cc.lib`, `util-linux.lib`, `gtk3`, `glib`, `cairo`, `pango`, `atk`, `gdk-pixbuf`, `libnotify`, `libepoxy`, `libappindicator-gtk3`, `webkitgtk_4_1`, `zlib`, `dbus`, `libdrm`, `libxkbcommon`, `libX11`, `libXext`, `libXfixes`, `libXrandr`, `libXrender`, `libXinerama`, `libXcursor`, `libXi`, `libXtst`, `libICE`, `libSM`, `libxcb`, `alsa-lib`, `nss`, `nspr`, `fontconfig`, `freetype`
+- **注册**: `default.nix` → `pkgs.callPackage ./pkgs/sunloginclient { }`
+- **NixOS 模块**: `nixos-modules/sunloginclient.nix` (提供 `services.sunloginclient` 选项，配置 `programs.nix-ld.libraries` 确保环境就绪)
+
+### 5. CI 流水线 (`.github/workflows/build.yml`)
 
 - **触发器**: PR、push 到 main/master、每日定时（02:51）、手动触发
 - **矩阵**: `nixpkgs-unstable`, `nixos-unstable`, `nixos-26.05`
@@ -93,6 +107,9 @@ nix run github:sgnay/sgnur-packages#univpn
 # 通过 Flake 运行 NyaTerm
 nix run github:sgnay/sgnur-packages#nyaterm
 
+# 通过 Flake 运行 Sunlogin (AweSun)
+nix run github:sgnay/sgnur-packages#sunloginclient
+
 # 通过 NixOS 模块启用 UniVPN
 # configuration.nix:
 {
@@ -100,12 +117,15 @@ nix run github:sgnay/sgnur-packages#nyaterm
   services.univpn.enable = true;
 }
 
-# 通过 overlay 使用
-nix-build -E 'with import <nixpkgs> { overlays = [ (import ./overlay.nix) ]; }; univpn'
+# 通过 NixOS 模块启用 Sunlogin
+# configuration.nix:
+{
+  imports = [ inputs.sgnur-packages.nixosModules.sunloginclient ];
+  services.sunloginclient.enable = true;
+}
 
 # 本地构建
-nix-build -A nyaterm
-./result/bin/nyaterm
+nix-build -A sunloginclient
 ```
 
 ## 已完成的改进
@@ -123,6 +143,9 @@ nix-build -A nyaterm
 | nyaterm .desktop 文件 | ✅ | 含图标，可从桌面启动器打开 |
 | nyaterm custom-protocol | ✅ | 修复空窗口问题（使用内嵌前端资源） |
 | nyaterm 字体渲染 | ✅ | 设置 GDK_BACKEND=x11 改善模糊问题 |
+| 打包 sunloginclient | ✅ | 向日葵远程控制客户端 (AweSun)，版本 16.5.0 |
+| sunloginclient 混合打包 | ✅ | 后台守护进程 patchelf + 客户端 nix-ld，绕过完整性校验并解决 Systemd 变量清理问题 |
+| sunloginclient 服务模块 | ✅ | 一键开启 `services.sunloginclient`，配置全局 nix-ld 依赖支持 |
 
 ## 后续建议
 
@@ -133,3 +156,4 @@ nix-build -A nyaterm
 | 补充 `overlays/` | 低 | 当前为空，有额外 overlay 时可放入 |
 | nyaterm NixOS 模块 | 中 | 可创建 NixOS 模块以集成桌面文件、DBus 服务等 |
 | nyaterm 版本更新 | 持续 | 上游无标签，需手动更新提交哈希和 Cargo.lock |
+| sunloginclient 版本更新 | 持续 | 官方升级时及时跟进 Deb 地址与 SHA256 校验码 |
