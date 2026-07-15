@@ -157,6 +157,9 @@ stdenv.mkDerivation rec {
     homepage = "https://sunlogin.oray.com";
     license = licenses.unfree;
     platforms = [ "x86_64-linux" ];
-    maintainers = with maintainers; [ sgnay ];
+    maintainers = [ {
+      name = "sgnay";
+      github = "sgnay";
+    } ];
   };
 }

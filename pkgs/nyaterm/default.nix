@@ -147,7 +147,10 @@ rustPlatform.buildRustPackage {
     homepage = "https://nyaterm.app";
     changelog = "https://github.com/nyakang/nyaterm/blob/v${version}/CHANGELOG.md";
     license = licenses.mit;
-    maintainers = with maintainers; [ sgnay ];
+    maintainers = [ {
+      name = "sgnay";
+      github = "sgnay";
+    } ];
     platforms = platforms.linux;
     mainProgram = "nyaterm";
   };
