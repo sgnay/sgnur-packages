@@ -26,4 +26,6 @@
   omp = pkgs.callPackage ./pkgs/omp { };  # Oh My Pi — terminal coding agent
 
   sunloginclient = pkgs.callPackage ./pkgs/sunloginclient { }; # Proprietary remote control software (AweSun / Sunlogin Client)
+
+  rustconn = pkgs.callPackage ./pkgs/rustconn { }; # Modern connection manager for Linux with GTK4/Wayland-native interface
 }
