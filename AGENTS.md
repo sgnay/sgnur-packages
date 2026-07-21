@@ -61,7 +61,7 @@ sgnur-packages/
 
 ### 3. NyaTerm 包 (`pkgs/nyaterm`)
 
-- **版本**: `1.1.13`（基于 Git 提交 `2f0059d6`，上游无标签）
+- **版本**: `1.1.16`（基于 GitHub Tag `v1.1.16`）
 - **描述**: [NyaTerm](https://nyaterm.app) — 基于 Tauri 2 + React + Rust 的现代远程终端工作区
 - **功能**: SSH 客户端、本地终端、Telnet、串口、SFTP、OTP、SSH 隧道、AI 辅助、加密同步
 - **架构**:
@@ -171,5 +171,5 @@ nix-build -A sunloginclient
 | 补充 `lib/` 函数 | 低 | 当前为空，有通用 Nix 函数时可放入 |
 | 补充 `overlays/` | 低 | 当前为空，有额外 overlay 时可放入 |
 | nyaterm NixOS 模块 | 中 | 可创建 NixOS 模块以集成桌面文件、DBus 服务等 |
-| nyaterm 版本更新 | 持续 | 上游无标签，需手动更新提交哈希和 Cargo.lock |
+| nyaterm 版本更新 | 持续 | 当上游发布新 Tag 时，需更新 Tag 版本、源哈希、pnpmDeps 哈希及 Cargo.lock |
 | sunloginclient 版本更新 | 持续 | 官方升级时及时跟进 Deb 地址与 SHA256 校验码 |

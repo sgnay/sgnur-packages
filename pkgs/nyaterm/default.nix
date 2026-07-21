@@ -11,15 +11,14 @@
 }:
 
 let
-  version = "1.1.13";
+  version = "1.1.16";
   pname = "nyaterm";
 
-  # No tags in the repo, use the latest commit on main
   src = fetchFromGitHub {
     owner = "nyakang";
     repo = "nyaterm";
-    rev = "2f0059d69058ad75b12c7a64a65c97528d1cfa49";
-    hash = "sha256-9bbZFYZH0J0vqLYs/H2HaYGlCS2ItG/YVj6oiR+/qM4=";
+    rev = "v1.1.16";
+    hash = "sha256-cZE/M6ERINtaE4LLGbzOezhhkRntpWXDek7o3vfidhE=";
   };
 
   # Pre-fetched pnpm dependencies
@@ -27,7 +26,7 @@ let
     inherit pname version src;
     pnpm = pnpm;
     fetcherVersion = 3;
-    hash = "sha256-DddIM6y1vRvO845QXPPxQk6RLkV7Ey8KJ31gb0EfO2M=";
+    hash = "sha256-xY3L15Epuau8Gq9/v0u3vrK04ymGAa0C5uU0kLkaZIk=";
   };
 in
 rustPlatform.buildRustPackage {
