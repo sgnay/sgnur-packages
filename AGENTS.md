@@ -173,3 +173,13 @@ nix-build -A sunloginclient
 | nyaterm NixOS 模块 | 中 | 可创建 NixOS 模块以集成桌面文件、DBus 服务等 |
 | nyaterm 版本更新 | 持续 | 当上游发布新 Tag 时，需更新 Tag 版本、源哈希、pnpmDeps 哈希及 Cargo.lock |
 | sunloginclient 版本更新 | 持续 | 官方升级时及时跟进 Deb 地址与 SHA256 校验码 |
+
+## GUI 应用打包与 Launcher 兼容性指南 (Desktop Launcher Packaging Rules)
+
+### 核心原则
+在为 NixOS / Wayland (Niri) / Home Manager 打包图形化应用（如 Tauri、GPUI、GTK4、Qt）时，**绝不能使用 `nix-shell` 或脚本进行运行时动态加载**。桌面 Launcher（如 Niri Launcher / fuzzel / rofi）会在非交互无终端的环境下直接调用 `.desktop` 中的 `Exec` 命令，`nix-shell` 会在此环境下挂起或退出。
+
+### 标准打包规范
+1. **`makeWrapper` 依赖硬编码**：使用 `makeWrapper` 显式写入 `LD_LIBRARY_PATH`（如 `fontconfig`, `freetype`, `libxkbcommon`, `wayland`, `vulkan-loader`, `libGL`, `alsa-lib`, `dbus`, `openssl`, `udev`, `stdenv.cc.cc.lib` 等）。
+2. **`XDG_DATA_DIRS` 自动注入**：必须前缀包含 `${pkgs.fontconfig}/share:${pkgs.gtk3}/share/gsettings-schemas/gtk+3-${pkgs.gtk3.version}`，防止 GUI 应用因找不到 Schema 或图标在后台静默崩溃。
+3. **Home Manager 自动化 Symlink**：将包包含在 Home Manager 的 `home.packages` 中，会自动生成 `~/.nix-profile/share/applications/*.desktop` 和 `~/.nix-profile/bin/*` 软链接，桌面 Launcher 会自动无缝索引。

@@ -28,4 +28,6 @@
   sunloginclient = pkgs.callPackage ./pkgs/sunloginclient { }; # Proprietary remote control software (AweSun / Sunlogin Client)
 
   rustconn = pkgs.callPackage ./pkgs/rustconn { }; # Modern connection manager for Linux with GTK4/Wayland-native interface
+
+  oxideterm = pkgs.callPackage ./pkgs/oxideterm { }; # AI-native workspace for local shells and remote machines
 }
