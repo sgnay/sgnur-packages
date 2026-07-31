@@ -1,9 +1,7 @@
 { lib
 , pkgs
 , stdenv
-, fetchFromGitHub
-, pkg-config
-, cmake
+, fetchzip
 , fontconfig
 , freetype
 , libxkbcommon
@@ -21,11 +19,9 @@
 , dbus
 , openssl
 , zlib
-, sqlite
 , udev
 , gst_all_1
 , makeWrapper
-, binaryDir ? /home/sgnay/oxideterm/target/release
 }:
 
 let
@@ -59,11 +55,9 @@ in
 stdenv.mkDerivation {
   inherit pname version;
 
-  src = fetchFromGitHub {
-    owner = "AnalyseDeCircuit";
-    repo = "oxideterm";
-    rev = "fc3dd77b2a6ff596f7e783800a53e72f942101c0";
-    hash = "sha256-dUALHeFkJIEKPhXLYelkhha2+9EoB+yLPCX3nnf05Fg=";
+  src = fetchzip {
+    url = "https://github.com/AnalyseDeCircuit/oxideterm/releases/download/v${version}/OxideTerm_${version}_linux_x64_portable.tar.gz";
+    hash = "sha256-blrHVteBljREznL012fQyZjct1QulvkCv5hU9/kJAyY=";
   };
 
   nativeBuildInputs = [
@@ -73,20 +67,26 @@ stdenv.mkDerivation {
   dontBuild = true;
 
   installPhase = ''
-    mkdir -p $out/bin $out/share/applications $out/share/icons/hicolor/128x128/apps $out/share/icons/hicolor/64x64/apps
+    mkdir -p $out/bin $out/share/applications $out/share/icons/hicolor/128x128/apps $out/share/icons/hicolor/64x64/apps $out/share/oxideterm
 
-    cp ${binaryDir}/oxideterm-native $out/bin/oxideterm-native
-    cp ${binaryDir}/oxideterm $out/bin/oxideterm-cli
+    # Copy resources & binaries
+    cp -r $src/* $out/share/oxideterm/
+    cp $src/resources/icons/128x128.png $out/share/icons/hicolor/128x128/apps/oxideterm.png 2>/dev/null || true
+    cp $src/resources/icons/64x64.png $out/share/icons/hicolor/64x64/apps/oxideterm.png 2>/dev/null || true
 
-    cp $src/crates/oxideterm-gpui-app/resources/icons/128x128.png $out/share/icons/hicolor/128x128/apps/oxideterm.png
-    cp $src/crates/oxideterm-gpui-app/resources/icons/64x64.png $out/share/icons/hicolor/64x64/apps/oxideterm.png
+    cp $src/oxideterm-native $out/bin/oxideterm-native
+    if [ -f $src/resources/cli-bin/x86_64-unknown-linux-gnu/oxideterm ]; then
+      cp $src/resources/cli-bin/x86_64-unknown-linux-gnu/oxideterm $out/bin/oxideterm-cli
+    fi
 
     makeWrapper $out/bin/oxideterm-native $out/bin/oxideterm \
       --prefix LD_LIBRARY_PATH : "${libPath}" \
       --prefix XDG_DATA_DIRS : "${fontconfig}/share:${pkgs.gtk3}/share/gsettings-schemas/gtk+3-${pkgs.gtk3.version}"
 
-    makeWrapper $out/bin/oxideterm-cli $out/bin/oxideterm-cli-wrapper \
-      --prefix LD_LIBRARY_PATH : "${libPath}"
+    if [ -f $out/bin/oxideterm-cli ]; then
+      makeWrapper $out/bin/oxideterm-cli $out/bin/oxideterm-cli-wrapper \
+        --prefix LD_LIBRARY_PATH : "${libPath}"
+    fi
 
     cat <<EOF > $out/share/applications/oxideterm.desktop
 [Desktop Entry]
