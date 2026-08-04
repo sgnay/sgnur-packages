@@ -16,6 +16,8 @@
 | `sunloginclient` | 向日葵远程控制客户端 (AweSun Client) | ✅ 可用 |
 | `sunloginclient-nixos-module` | 向日葵远程控制 NixOS 模块（`services.sunloginclient.enable`） | ✅ 可用 |
 | `velotype` | [Velotype](https://github.com/manyougz/velotype) — 基于 Rust + GPUI 的原生 Markdown 编辑器 (WYSIWYG/源码) | ✅ 可用 |
+| `goose` | [Goose](https://github.com/aaif-goose/goose) — 开源、可扩展的终端 AI Agent 命令行工具 | ✅ 可用 |
+| `goose-desktop` | [Goose Desktop](https://github.com/aaif-goose/goose) — Goose AI Agent 桌面图形应用 | ✅ 可用 |
 
 ## 使用方式
 
@@ -41,11 +43,11 @@ nix run github:sgnay/sgnur-packages#nyaterm
 # 运行 Oh My Pi
 nix run github:sgnay/sgnur-packages#omp
 
-# 运行 Sunlogin (AweSun)
-nix run github:sgnay/sgnur-packages#sunloginclient
+# 运行 Goose CLI
+nix run github:sgnay/sgnur-packages#goose
 
-# 运行 Velotype
-nix run github:sgnay/sgnur-packages#velotype
+# 运行 Goose Desktop
+nix run github:sgnay/sgnur-packages#goose-desktop
 ```
 
 #### 作为 NixOS 模块启用

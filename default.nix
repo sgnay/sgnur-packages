@@ -34,4 +34,8 @@
   velotype = pkgs.callPackage ./pkgs/velotype { }; # Native Markdown editor built with Rust and GPUI
 
   pot-translation = pkgs.callPackage ./pkgs/pot-translation { }; # Pot — Cross-platform translation and OCR software
+
+  goose = pkgs.callPackage ./pkgs/goose { }; # Goose — open-source extensible AI agent CLI
+
+  goose-desktop = pkgs.callPackage ./pkgs/goose-desktop { }; # Goose Desktop — open-source AI agent GUI application
 }
