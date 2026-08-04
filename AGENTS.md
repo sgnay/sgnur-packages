@@ -102,7 +102,17 @@ sgnur-packages/
 - **注册**: `default.nix` → `pkgs.callPackage ./pkgs/sunloginclient { }`
 - **NixOS 模块**: `nixos-modules/sunloginclient.nix` (提供 `services.sunloginclient` 选项，配置 `programs.nix-ld.libraries` 确保环境就绪)
 
-### 6. CI 流水线 (`.github/workflows/build.yml`)
+### 6. Velotype 包 (`pkgs/velotype`)
+
+- **版本**: `0.7.0`
+- **描述**: [Velotype](https://github.com/manyougz/velotype) — 基于 Rust + GPUI 的原生的 Markdown 编辑器，支持所见即所得 (WYSIWYG) 与源码编辑模式
+- **构建方式**:
+  - `rustPlatform.buildRustPackage`
+  - 使用 `makeWrapper` 硬编码动态链接库与 `XDG_DATA_DIRS`，适配 Linux / Wayland 环境
+  - 安装 `.desktop` 桌面入口文件及多分辨率图标
+- **注册**: `default.nix` → `pkgs.callPackage ./pkgs/velotype { }`
+
+### 7. CI 流水线 (`.github/workflows/build.yml`)
 
 - **触发器**: PR、push 到 main/master、每日定时（02:51）、手动触发
 - **矩阵**: `nixpkgs-unstable`, `nixos-unstable`, `nixos-26.05`
@@ -124,6 +134,9 @@ nix run github:sgnay/sgnur-packages#omp
 # 通过 Flake 运行 Sunlogin (AweSun)
 nix run github:sgnay/sgnur-packages#sunloginclient
 
+# 通过 Flake 运行 Velotype
+nix run github:sgnay/sgnur-packages#velotype
+
 # 通过 NixOS 模块启用 UniVPN
 # configuration.nix:
 {
@@ -139,7 +152,7 @@ nix run github:sgnay/sgnur-packages#sunloginclient
 }
 
 # 本地构建
-nix-build -A sunloginclient
+nix-build -A velotype
 ```
 
 ## 已完成的改进
@@ -162,6 +175,7 @@ nix-build -A sunloginclient
 | sunloginclient 服务模块 | ✅ | 一键开启 `services.sunloginclient`，配置全局 nix-ld 依赖支持 |
 | 打包 oh-my-pi | ✅ | Oh My Pi — 终端原生 AI 编程助手，免编译二进制包装 |
 | 宿主机密钥安全 | ✅ | 将 plaintext 敏感配置 secrets.nix 替换为 sops-nix 密钥密文管理，使用机器 SSH Host Key 动态解密 |
+| 打包 velotype | ✅ | Velotype — 基于 Rust + GPUI 的 Markdown 编辑器（版本 0.7.0） |
 
 ## 后续建议
 

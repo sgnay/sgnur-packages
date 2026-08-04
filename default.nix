@@ -30,4 +30,8 @@
   rustconn = pkgs.callPackage ./pkgs/rustconn { }; # Modern connection manager for Linux with GTK4/Wayland-native interface
 
   oxideterm = pkgs.callPackage ./pkgs/oxideterm { }; # AI-native workspace for local shells and remote machines
+
+  velotype = pkgs.callPackage ./pkgs/velotype { }; # Native Markdown editor built with Rust and GPUI
+
+  pot-translation = pkgs.callPackage ./pkgs/pot-translation { }; # Pot — Cross-platform translation and OCR software
 }

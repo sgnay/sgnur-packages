@@ -15,6 +15,7 @@
 | `omp` | [Oh My Pi](https://github.com/can1357/oh-my-pi) — 终端原生 AI 编程助手 | ✅ 可用 |
 | `sunloginclient` | 向日葵远程控制客户端 (AweSun Client) | ✅ 可用 |
 | `sunloginclient-nixos-module` | 向日葵远程控制 NixOS 模块（`services.sunloginclient.enable`） | ✅ 可用 |
+| `velotype` | [Velotype](https://github.com/manyougz/velotype) — 基于 Rust + GPUI 的原生 Markdown 编辑器 (WYSIWYG/源码) | ✅ 可用 |
 
 ## 使用方式
 
@@ -42,6 +43,9 @@ nix run github:sgnay/sgnur-packages#omp
 
 # 运行 Sunlogin (AweSun)
 nix run github:sgnay/sgnur-packages#sunloginclient
+
+# 运行 Velotype
+nix run github:sgnay/sgnur-packages#velotype
 ```
 
 #### 作为 NixOS 模块启用
