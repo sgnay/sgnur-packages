@@ -38,4 +38,6 @@
   goose = pkgs.callPackage ./pkgs/goose { }; # Goose — open-source extensible AI agent CLI
 
   goose-desktop = pkgs.callPackage ./pkgs/goose-desktop { }; # Goose Desktop — open-source AI agent GUI application
+
+  simple-translation = pkgs.callPackage ./pkgs/simple-translation { }; # Simple Translation — A simple Linux desktop translator written in Rust and egui
 }
