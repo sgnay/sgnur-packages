@@ -145,40 +145,68 @@ stdenv.mkDerivation {
   '';
 
   installPhase = ''
-        runHook preInstall
+    runHook preInstall
 
-        mkdir -p $out/bin $out/lib $out/share
-        cp -r usr/share/* $out/share/
-        cp -r usr/lib/goose $out/lib/
+    mkdir -p $out/bin $out/lib $out/share/applications $out/share/pixmaps $out/share/icons/hicolor/512x512/apps
+    cp -r usr/share/* $out/share/ 2>/dev/null || true
+    cp -r usr/lib/goose $out/lib/
 
-        # 修复 Electron 主窗口初始隐藏问题，强行开启启动即显示窗口 (show: true)
-        python3 -c '
-    with open("'$out'/lib/goose/resources/app.asar", "rb") as f:
-        d = f.read()
-    d = d.replace(b"BrowserWindow({show:!1", b"BrowserWindow({show:!0")
-    with open("'$out'/lib/goose/resources/app.asar", "wb") as f:
-        f.write(d)
-    '
+    # 清理 deb 包中原本不可用/空的 .desktop 占位文件
+    rm -rf $out/share/applications/*
 
-        # 建立 ANGLE 渲染所需的 EGL 与 GLES 共享动态库符号链接
-        ln -s libEGL.so $out/lib/goose/libEGL.so.1 || true
-        ln -s libGLESv2.so $out/lib/goose/libGLESv2.so.2 || true
+    # 修复 Electron 主窗口初始隐藏问题，强行开启启动即显示窗口 (show: true)
+    python3 -c '
+with open("'$out'/lib/goose/resources/app.asar", "rb") as f:
+    d = f.read()
+d = d.replace(b"BrowserWindow({show:!1", b"BrowserWindow({show:!0")
+with open("'$out'/lib/goose/resources/app.asar", "wb") as f:
+    f.write(d)
+'
 
-        # 封装可执行文件并注入库路径、XDG 资源环境及 Electron 必要的沙盒与 GPU 参数
-        makeWrapper $out/lib/goose/Goose $out/bin/goose-desktop \
-          --prefix LD_LIBRARY_PATH : "$out/lib/goose:${libPath}" \
-          --prefix XDG_DATA_DIRS : "${fontconfig}/share:${pkgs.gtk3}/share/gsettings-schemas/gtk+3-${pkgs.gtk3.version}" \
-          --add-flags "--no-sandbox" \
-          --add-flags "--disable-gpu-sandbox" \
-          --add-flags "--disable-gpu"
+    # 建立 ANGLE 渲染所需的 EGL 与 GLES 共享动态库符号链接
+    ln -s libEGL.so $out/lib/goose/libEGL.so.1 || true
+    ln -s libGLESv2.so $out/lib/goose/libGLESv2.so.2 || true
 
-        # 修复 desktop 文件中的 Exec 路径与 Icon 名称
-        if [ -f $out/share/applications/goose.desktop ]; then
-          substituteInPlace $out/share/applications/goose.desktop \
-            --replace-fail "Exec=goose" "Exec=$out/bin/goose-desktop" || true
-        fi
+    # 封装可执行文件并注入库路径、XDG 资源环境及 Electron 必要的沙盒与 GPU 参数
+    makeWrapper $out/lib/goose/Goose $out/bin/goose-desktop \
+      --prefix LD_LIBRARY_PATH : "$out/lib/goose:${libPath}" \
+      --prefix XDG_DATA_DIRS : "${fontconfig}/share:${pkgs.gtk3}/share/gsettings-schemas/gtk+3-${pkgs.gtk3.version}" \
+      --add-flags "--no-sandbox" \
+      --add-flags "--disable-gpu-sandbox" \
+      --add-flags "--disable-gpu"
 
-        runHook postInstall
+    # 复制并配置图标
+    if [ -f $out/share/pixmaps/goose.png ]; then
+      cp $out/share/pixmaps/goose.png $out/share/icons/hicolor/512x512/apps/goose-desktop.png
+      cp $out/share/pixmaps/goose.png $out/share/icons/hicolor/512x512/apps/goose.png
+    fi
+
+    # 生成标准的 Desktop 桌面入口文件
+    cat <<EOF > $out/share/applications/goose-desktop.desktop
+[Desktop Entry]
+Name=Goose Desktop
+Comment=Open source AI agent application
+Exec=$out/bin/goose-desktop %U
+Icon=goose-desktop
+Terminal=false
+Type=Application
+Categories=Development;Utility;
+Keywords=goose;ai;agent;llm;chat;
+EOF
+
+    cat <<EOF > $out/share/applications/goose.desktop
+[Desktop Entry]
+Name=Goose Desktop
+Comment=Open source AI agent application
+Exec=$out/bin/goose-desktop %U
+Icon=goose
+Terminal=false
+Type=Application
+Categories=Development;Utility;
+Keywords=goose;ai;agent;llm;chat;
+EOF
+
+    runHook postInstall
   '';
 
   meta = with lib; {
