@@ -178,7 +178,7 @@ nix-build -A velotype
 | 打包 velotype | ✅ | Velotype — 基于 Rust + GPUI 的 Markdown 编辑器（版本 0.7.0） |
 | 打包 goose | ✅ | Goose — 开源、可扩展的 AI Agent CLI 工具（版本 1.45.0） |
 | 打包 goose-desktop | ✅ | Goose Desktop — 开源 AI Agent 桌面图形应用（版本 1.45.0） |
-| 打包 simple-translation | ✅ | Simple Translation — 基于 Rust + egui 的极简 Linux 桌面翻译工具（版本 0.1.0） |
+| 打包 simple-translation | ✅ | Simple Translation — 基于 Rust + egui 的极简 Linux 桌面翻译工具（版本 0.1.2） |
 
 ## 后续建议
 

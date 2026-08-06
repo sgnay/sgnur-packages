@@ -32,16 +32,16 @@ let
 in
 rustPlatform.buildRustPackage rec {
   pname = "simple-translation";
-  version = "0.1.0";
+  version = "0.1.2";
 
   src = fetchFromGitHub {
     owner = "sgnay";
     repo = "simple-translation";
-    rev = "798b8a0ca59ccff31ad259f6ff5ce118d968e30a";
-    hash = "sha256-1oF6Ctrw7OOQY2UkecAy8+fYmovPY2DTlQM61m/DWkU=";
+    rev = "de8195435f1ed80d8bc2aaaeced85e4f639303d3";
+    hash = "sha256-vwDPw1dsLjMUfEfE+2rBXOc9QeKl8mzra0h1ViEriu0=";
   };
 
-  cargoHash = "sha256-64p/K40yFbUaOcfXNbGbhegiUGD1mK9hFgwqWdQvm1I=";
+  cargoHash = "sha256-v80lp6KmYQrbRZKlW92KHgKzTznkJbzLeiEer8iGnnk=";
 
   nativeBuildInputs = [
     pkg-config
