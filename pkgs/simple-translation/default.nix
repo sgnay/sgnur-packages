@@ -15,8 +15,9 @@
   libXi,
   openssl,
   dbus,
+  nss,
+  cacert,
 }:
-
 let
   libPath = lib.makeLibraryPath [
     wayland
@@ -32,16 +33,16 @@ let
 in
 rustPlatform.buildRustPackage rec {
   pname = "simple-translation";
-  version = "0.1.2";
+  version = "0.1.4";
 
   src = fetchFromGitHub {
     owner = "sgnay";
     repo = "simple-translation";
-    rev = "de8195435f1ed80d8bc2aaaeced85e4f639303d3";
-    hash = "sha256-vwDPw1dsLjMUfEfE+2rBXOc9QeKl8mzra0h1ViEriu0=";
+    rev = "54e4cbc622925d4770b6350743ef7326cab0b94a";
+    hash = "sha256-42q3+oEEWEjCTOIqN36TEZE45jQVVcUoMKVaMPlLoc8=";
   };
 
-  cargoHash = "sha256-v80lp6KmYQrbRZKlW92KHgKzTznkJbzLeiEer8iGnnk=";
+  cargoHash = "sha256-FKS34O38fMkZEplA6FJe8hseKjYTHw78pKGJfw71CB0=";
 
   nativeBuildInputs = [
     pkg-config
@@ -59,9 +60,13 @@ rustPlatform.buildRustPackage rec {
     libXi
     openssl
     dbus
+    nss
   ];
 
+  doCheck = false;
+
   postInstall = ''
+
     mkdir -p $out/share/applications
 
     cat <<EOF > $out/share/applications/simple-translation.desktop
@@ -77,7 +82,8 @@ Keywords=translation;translator;dictionary;
 EOF
 
     wrapProgram $out/bin/simple-translation \
-      --prefix LD_LIBRARY_PATH : "${libPath}"
+      --prefix LD_LIBRARY_PATH : "${libPath}" \
+      --set SSL_CERT_FILE "${cacert}/etc/ssl/certs/ca-bundle.crt"
   '';
 
   meta = with lib; {
