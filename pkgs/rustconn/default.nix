@@ -12,20 +12,22 @@
 , gettext
 , glib
 , gtk4
+, libsoup_3
+, webkitgtk_6_0
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "rustconn";
-  version = "0.18.8";
+  version = "0.19.22";
 
   src = fetchFromGitHub {
     owner = "totoshko88";
     repo = "RustConn";
     rev = "v${version}";
-    hash = "sha256-GZIMcXehl8ohAvjcGveVp4pcNdcpl/HI8VWtT6UgPVw=";
+    sha256 = "9k9jz1glQcV4e4g503oJtULbPBOU6RR1BAGodseohfA=";
   };
 
-  cargoHash = "sha256-3wszGV03MAZ4ckbIZ0V91Re1CO2m9vclOCnOYUQdt3w=";
+  cargoHash = "sha256-hdENCe/zYAA2gE1qaADs6XAN4z/+TLNBTDTSgSoggWU=";
 
   nativeBuildInputs = [
     pkg-config
@@ -43,6 +45,8 @@ rustPlatform.buildRustPackage rec {
     alsa-lib
     glib
     gtk4
+    libsoup_3
+    webkitgtk_6_0
   ];
 
   # RustConn is a cargo workspace containing rustconn (GUI) and rustconn-cli (CLI).

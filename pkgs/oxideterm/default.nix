@@ -26,7 +26,7 @@
 
 let
   pname = "oxideterm";
-  version = "2.0.14";
+  version = "2.0.19";
 
   libPath = lib.makeLibraryPath [
     fontconfig
@@ -57,7 +57,7 @@ stdenv.mkDerivation {
 
   src = fetchzip {
     url = "https://github.com/AnalyseDeCircuit/oxideterm/releases/download/v${version}/OxideTerm_${version}_linux_x64_portable.tar.gz";
-    hash = "sha256-blrHVteBljREznL012fQyZjct1QulvkCv5hU9/kJAyY=";
+    sha256 = "pfqt/CrH1WJ1AKoE4w1Xkr2mxOdTnFWlZSSiWw+FHUU=";
   };
 
   nativeBuildInputs = [
@@ -69,8 +69,8 @@ stdenv.mkDerivation {
   installPhase = ''
     mkdir -p $out/bin $out/share/applications $out/share/icons/hicolor/128x128/apps $out/share/icons/hicolor/64x64/apps $out/share/oxideterm
 
-    # Copy resources & binaries
-    cp -r $src/* $out/share/oxideterm/
+    # fetchzip unpacks the archive contents directly
+    cp -rT $src $out/share/oxideterm
     cp $src/resources/icons/128x128.png $out/share/icons/hicolor/128x128/apps/oxideterm.png 2>/dev/null || true
     cp $src/resources/icons/64x64.png $out/share/icons/hicolor/64x64/apps/oxideterm.png 2>/dev/null || true
 
@@ -78,7 +78,6 @@ stdenv.mkDerivation {
     if [ -f $src/resources/cli-bin/x86_64-unknown-linux-gnu/oxideterm ]; then
       cp $src/resources/cli-bin/x86_64-unknown-linux-gnu/oxideterm $out/bin/oxideterm-cli
     fi
-
     makeWrapper $out/bin/oxideterm-native $out/bin/oxideterm \
       --prefix LD_LIBRARY_PATH : "${libPath}" \
       --prefix XDG_DATA_DIRS : "${fontconfig}/share:${pkgs.gtk3}/share/gsettings-schemas/gtk+3-${pkgs.gtk3.version}"
