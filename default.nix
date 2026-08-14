@@ -40,4 +40,6 @@
   goose-desktop = pkgs.callPackage ./pkgs/goose-desktop { }; # Goose Desktop — open-source AI agent GUI application
 
   simple-translation = pkgs.callPackage ./pkgs/simple-translation { }; # Simple Translation — A simple Linux desktop translator written in Rust and egui
+
+  deepseek-reasonix = pkgs.callPackage ./pkgs/deepseek-reasonix { }; # DeepSeek Reasonix — AI reasoning engine
 }

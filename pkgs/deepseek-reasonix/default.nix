@@ -41,6 +41,8 @@
   libsecret,
   fontconfig,
   freetype,
+  webkitgtk_4_1,
+  libsoup_3,
   pkgs,
 }:
 
@@ -84,6 +86,8 @@ let
     libsecret
     fontconfig
     freetype
+    webkitgtk_4_1
+    libsoup_3
   ];
 in
 stdenv.mkDerivation {
@@ -100,6 +104,8 @@ stdenv.mkDerivation {
     makeWrapper
     wrapGAppsHook3
   ];
+
+
 
   buildInputs = [
     gtk3
@@ -136,6 +142,8 @@ stdenv.mkDerivation {
     libsecret
     fontconfig
     freetype
+    webkitgtk_4_1
+    libsoup_3
   ];
 
   unpackPhase = ''
@@ -145,23 +153,33 @@ stdenv.mkDerivation {
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/bin $out/lib $out/share/applications $out/share/icons/hicolor
+    mkdir -p $out/bin $out/lib $out/share/applications $out/share/icons/hicolor $out/share/pixmaps
+    
+    # 复制二进制文件到 out/lib/reasonix
+    mkdir -p $out/lib/reasonix
+    cp usr/bin/reasonix-desktop $out/lib/reasonix/
+    cp usr/bin/reasonix-update-helper $out/lib/reasonix/ 2>/dev/null || true
+    
+    # 复制图标资源
     cp -r usr/share/icons $out/share/
-    cp -r usr/lib/reasonix $out/lib/
+    cp usr/share/pixmaps/reasonix-desktop.png $out/share/pixmaps/ 2>/dev/null || true
+    
+    # 复制 polkit 策略文件
+    cp -r usr/share/polkit-1 $out/share/ 2>/dev/null || true
 
     # 清理 deb 包中原本指向 reasonix-launcher 的 .desktop 文件
     rm -rf $out/share/applications/*
 
-    # 封装可执行文件并注入库路径、XDG 资源环境
-    # reasonix-launcher 是实际启动器，reasonix-desktop 是主二进制
-    makeWrapper $out/lib/reasonix/reasonix-launcher $out/bin/deepseek-reasonix \
+    # 封装 reasonix-desktop 主二进制并注入库路径、XDG 资源环境
+    # reasonix-desktop 是动态链接的 GUI 主程序
+    makeWrapper $out/lib/reasonix/reasonix-desktop $out/bin/deepseek-reasonix \
       --prefix LD_LIBRARY_PATH : "$out/lib/reasonix:${libPath}" \
       --prefix XDG_DATA_DIRS : "${fontconfig}/share:${pkgs.gtk3}/share/gsettings-schemas/gtk+3-${pkgs.gtk3.version}"
 
     # 复制图标到 512x512 尺寸（Launcher 常用）
     mkdir -p $out/share/icons/hicolor/512x512/apps
-    if [ -f $out/share/icons/hicolor/256x256/apps/reasonix-desktop.png ]; then
-      cp $out/share/icons/hicolor/256x256/apps/reasonix-desktop.png $out/share/icons/hicolor/512x512/apps/deepseek-reasonix.png
+    if [ -f $out/share/icons/hicolor/512x512/apps/reasonix-desktop.png ]; then
+      cp $out/share/icons/hicolor/512x512/apps/reasonix-desktop.png $out/share/icons/hicolor/512x512/apps/deepseek-reasonix.png
     fi
 
     # 生成标准的 Desktop 桌面入口文件
@@ -169,7 +187,7 @@ stdenv.mkDerivation {
 [Desktop Entry]
 Type=Application
 Name=DeepSeek Reasonix
-Comment=AI reasoning engine desktop application
+Comment=Reasonix desktop — a Wails shell around the Go kernel
 Exec=$out/bin/deepseek-reasonix %U
 Icon=deepseek-reasonix
 Terminal=false

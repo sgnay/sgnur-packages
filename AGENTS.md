@@ -119,6 +119,19 @@ sgnur-packages/
 - **nurRepo**: `sgnur-packages`
 - **cachix**: 未配置（默认跳过）
 
+### 8. DeepSeek Reasonix 包 (`pkgs/deepseek-reasonix`)
+
+- **版本**: `1.25.1` (Reasonix Desktop)
+- **描述**: [DeepSeek Reasonix](https://github.com/esengine/deepseek-reasonix) — AI reasoning engine 桌面应用
+- **构建方式**:
+  - 使用官方预编译的 `.deb` 包 (`Reasonix-linux-amd64.deb`)
+  - `dpkg-deb` 解压 → `autoPatchelfHook` 修复 RPATH → `makeWrapper` 注入依赖库路径
+  - 安装 `.desktop` 桌面入口文件及多分辨率图标
+- **可执行文件**: `reasonix-launcher` (通过 wrapper 暴露为 `deepseek-reasonix`)
+- **系统依赖**: `gtk3`, `glib`, `cairo`, `pango`, `atk`, `gdk-pixbuf`, `libnotify`, `libsecret`, `libxkbcommon`, `libX11`, `libXcomposite`, `libXdamage`, `libXext`, `libXfixes`, `libXrandr`, `libXrender`, `libXtst`, `libxcb`, `dbus`, `openssl`, `zlib`, `alsa-lib`, `fontconfig`, `freetype`, `mesa`, `libGL`, `vulkan-loader`, `webkitgtk_4_1`, `libsoup_3`
+- **许可**: Unfree (专有软件)
+- **注册**: `default.nix` → `pkgs.callPackage ./pkgs/deepseek-reasonix { }`
+
 ## 使用方式
 
 ```bash
@@ -136,6 +149,9 @@ nix run github:sgnay/sgnur-packages#sunloginclient
 
 # 通过 Flake 运行 Velotype
 nix run github:sgnay/sgnur-packages#velotype
+
+# 通过 Flake 运行 DeepSeek Reasonix
+nix run github:sgnay/sgnur-packages#deepseek-reasonix
 
 # 通过 NixOS 模块启用 UniVPN
 # configuration.nix:
@@ -179,6 +195,7 @@ nix-build -A velotype
 | 打包 goose | ✅ | Goose — 开源、可扩展的 AI Agent CLI 工具（版本 1.45.0） |
 | 打包 goose-desktop | ✅ | Goose Desktop — 开源 AI Agent 桌面图形应用（版本 1.45.0） |
 | 打包 simple-translation | ✅ | Simple Translation — 基于 Rust + egui 的极简 Linux 桌面翻译工具（版本 0.1.2） |
+| 打包 deepseek-reasonix | ✅ | DeepSeek Reasonix — AI reasoning engine（版本待更新） |
 
 ## 后续建议
 
