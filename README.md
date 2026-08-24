@@ -19,6 +19,7 @@
 | `goose` | [Goose](https://github.com/aaif-goose/goose) — 开源、可扩展的终端 AI Agent 命令行工具 | ✅ 可用 |
 | `goose-desktop` | [Goose Desktop](https://github.com/aaif-goose/goose) — Goose AI Agent 桌面图形应用 | ✅ 可用 |
 | `simple-translation` | [Simple Translation](https://github.com/sgnay/simple-translation) — 基于 Rust + egui 的极简 Linux 桌面翻译工具 | ✅ 可用 |
+| `simple-ocr` | [Simple OCR](https://github.com/sgnay/simple-ocr) — Simple Linux desktop OCR application using GPUI | ✅ 可用 |
 
 ## 使用方式
 
@@ -52,6 +53,8 @@ nix run github:sgnay/sgnur-packages#goose-desktop
 
 # 运行 Simple Translation
 nix run github:sgnay/sgnur-packages#simple-translation
+# 运行 Simple OCR
+nix run github:sgnay/sgnur-packages#simple-ocr
 ```
 
 #### 作为 NixOS 模块启用
