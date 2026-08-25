@@ -48,7 +48,7 @@
 
 let
   pname = "deepseek-reasonix";
-  version = "1.25.1";
+  version = "1.31.4";
 
   libPath = lib.makeLibraryPath [
     stdenvCC
@@ -95,7 +95,7 @@ stdenv.mkDerivation {
 
   src = fetchurl {
     url = "https://github.com/esengine/DeepSeek-Reasonix/releases/download/desktop-v${version}/Reasonix-linux-amd64.deb";
-    sha256 = "1ldzm4j5j1y44hmbpbcnng52chbg3pzj8ka9wdnfs5q5svan5ags";
+    sha256 = "eff3a4c99b6a8614228ddbff90b47fae16a36c7c400b1cc4214e256eb0d5da2b";
   };
 
   nativeBuildInputs = [

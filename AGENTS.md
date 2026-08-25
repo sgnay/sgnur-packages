@@ -217,3 +217,68 @@ nix-build -A velotype
 1. **`makeWrapper` 依赖硬编码**：使用 `makeWrapper` 显式写入 `LD_LIBRARY_PATH`（如 `fontconfig`, `freetype`, `libxkbcommon`, `wayland`, `vulkan-loader`, `libGL`, `alsa-lib`, `dbus`, `openssl`, `udev`, `stdenv.cc.cc.lib` 等）。
 2. **`XDG_DATA_DIRS` 自动注入**：必须前缀包含 `${pkgs.fontconfig}/share:${pkgs.gtk3}/share/gsettings-schemas/gtk+3-${pkgs.gtk3.version}`，防止 GUI 应用因找不到 Schema 或图标在后台静默崩溃。
 3. **Home Manager 自动化 Symlink**：将包包含在 Home Manager 的 `home.packages` 中，会自动生成 `~/.nix-profile/share/applications/*.desktop` 和 `~/.nix-profile/bin/*` 软链接，桌面 Launcher 会自动无缝索引。
+## Agent 踩坑记录
+
+### 禁止操作
+- **永远不要执行 `git push`**。用户已明确要求，commit 后由用户自行推送。
+
+### 版本更新常见错误
+
+#### 1. `fetchurl` / `fetchFromGitHub` 哈希更新
+当上游版本更新后，tarball/deb 内容变化导致 hash 不匹配。
+
+**症状**：
+```
+error: hash mismatch in fixed-output derivation ...
+         specified: sha256-XXXX...
+            got:    sha256-YYYY...
+```
+
+**正确做法**：
+1. 直接让 nix-build 报错，从输出中读取 `got:` 行获取新哈希
+2. 不要手动用 `nix-prefetch-url` 计算（它返回的是 tarball 哈希，而 `fetchFromGitHub` 需要 NAR 哈希，两者不同）
+3. 用 `got:` 的值替换 `sha256` 字段
+
+#### 2. `fetchPnpmDeps` 的 `fetcherVersion` 与 pnpm 版本绑定
+Nixpkgs 升级 pnpm 到 11.x 后，旧版 `fetcherVersion = 3` 不再兼容。
+
+**症状**：
+```
+error: fetchPnpmDeps `fetcherVersion = 3` is no longer supported for `pnpm_11`.
+       Please upgrade to the latest...
+```
+
+**正确做法**：
+- 将 `fetcherVersion = 3` 改为 `fetcherVersion = 4`
+- 同时更新 `hash`（再次让 nix-build 报错，取 `got:` 值）
+- **不要** 使用 `fetcherVersion = 5`（当前 nixpkgs 尚未支持）
+
+#### 3. `cargoLock.lockFile` 需要与上游版本同步
+升级 Rust crate 包时，`Cargo.lock` 文件内容也会变化，旧的本地 `Cargo.lock` 与新源码不匹配。
+
+**症状**：
+```
+ERROR: cargoHash or cargoSha256 is out of date
+       Cargo.lock is not the same in /build/cargo-vendor-dir
+```
+
+**正确做法**：
+1. 从上游 tag 下载新的 `Cargo.lock`（如 `https://raw.githubusercontent.com/.../v${version}/src-tauri/Cargo.lock`）
+2. 覆盖本地的 `Cargo.lock`
+3. 再构建获取正确的 `cargoHash`
+
+#### 4. 多包同时更新时的顺序
+更新多个包时，建议：
+1. 先逐个单独构建验证
+2. 确认每个包构建成功后再统一提交
+3. 不要一次性修改所有包的版本号而不验证
+
+### 哈希获取速查表
+
+| 场景 | 命令 / 方法 |
+|---|---|
+| `fetchurl`（tar.gz / .deb）哈希 | 运行 `nix-build`，从 `got: sha256-...` 取新值 |
+| `fetchFromGitHub` 源哈希 | 运行 `nix-build`，从 `got: sha256-...` 取新值 |
+| `fetchPnpmDeps` 哈希 | 更新 `fetcherVersion` 后运行 `nix-build`，从 `got: sha256-...` 取新值 |
+| `cargoHash` | 运行 `nix-build`，从 `got: sha256-...` 取新值 |
+| `nix-prefetch-url` | 返回 base32 NAR 哈希，**不适用于** `fetchFromGitHub` 的 SRI 格式 |

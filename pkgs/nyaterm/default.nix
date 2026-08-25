@@ -11,22 +11,22 @@
 }:
 
 let
-  version = "1.1.16";
+ version = "1.2.5";
   pname = "nyaterm";
 
   src = fetchFromGitHub {
     owner = "nyakang";
     repo = "nyaterm";
-    rev = "v1.1.16";
-    hash = "sha256-cZE/M6ERINtaE4LLGbzOezhhkRntpWXDek7o3vfidhE=";
+ rev = "v1.2.5";
+ hash = "sha256-EXz1FZsMutl4c47kxdCQah3Myr7M0EOsDDswq6pIYo4=";
   };
 
   # Pre-fetched pnpm dependencies
   pnpmDeps = fetchPnpmDeps {
     inherit pname version src;
     pnpm = pnpm;
-    fetcherVersion = 3;
-    hash = "sha256-xY3L15Epuau8Gq9/v0u3vrK04ymGAa0C5uU0kLkaZIk=";
+ fetcherVersion = 4;
+ hash = "sha256-5b/eiTJ869ModMu+NqBxb+MNw1mCF54sObwtVKnI3EA=";
   };
 in
 rustPlatform.buildRustPackage {

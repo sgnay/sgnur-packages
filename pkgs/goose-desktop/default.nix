@@ -47,7 +47,7 @@
 
 let
   pname = "goose-desktop";
-  version = "1.45.0";
+  version = "1.47.0";
 
   libPath = lib.makeLibraryPath [
     stdenvCC
@@ -92,7 +92,7 @@ stdenv.mkDerivation {
 
   src = fetchurl {
     url = "https://github.com/aaif-goose/goose/releases/download/v${version}/goose_${version}_amd64.deb";
-    sha256 = "009d2bsx4a5384b6280ih4s1hvzkpdmn7cv4zi8b1phgpkx6p20b";
+    sha256 = "sha256-2n2R83bpYqDtkoTd1nCJYWBbgxXPPrSWz3ffzGqFec0=";
   };
 
   nativeBuildInputs = [

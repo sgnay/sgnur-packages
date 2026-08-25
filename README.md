@@ -53,6 +53,7 @@ nix run github:sgnay/sgnur-packages#goose-desktop
 
 # 运行 Simple Translation
 nix run github:sgnay/sgnur-packages#simple-translation
+
 # 运行 Simple OCR
 nix run github:sgnay/sgnur-packages#simple-ocr
 ```
@@ -120,7 +121,7 @@ nix-env -f . -qa \* --meta --xml --drv-path --show-trace
 ## 项目结构
 
 ```
-.
+:.
 ├── flake.nix              # Flake 入口
 ├── default.nix            # 包集合入口
 ├── overlay.nix            # nixpkgs overlay

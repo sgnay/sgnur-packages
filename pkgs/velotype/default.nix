@@ -24,13 +24,13 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "velotype";
-  version = "0.7.0";
+ version = "0.7.2";
 
   src = fetchFromGitHub {
     owner = "manyougz";
     repo = "velotype";
     rev = "v${version}";
-    hash = "sha256-wGA2t4dBjEc9jAGnGdUL/0WOFdZuOPR5envcORoDx+o=";
+ hash = "sha256-IYd9FCabNz+FwpHd+Pzb1WFuvOPew2l2QI/P62+0A5g=";
   };
 
   cargoLock = {
