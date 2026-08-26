@@ -12,7 +12,6 @@
 | `univpn-nixos-module` | UniVPN NixOS 模块（`services.univpn.enable`） | ✅ 可用 |
 | `nyaterm` | [NyaTerm](https://nyaterm.app) — 现代远程终端工作区（SSH / SFTP / Telnet / Serial） | ✅ 可用 |
 | `nyaterm.desktop` | NyaTerm 桌面入口文件（含图标，可从应用菜单启动） | ✅ 自动安装 |
-| `omp` | [Oh My Pi](https://github.com/can1357/oh-my-pi) — 终端原生 AI 编程助手 | ✅ 可用 |
 | `sunloginclient` | 向日葵远程控制客户端 (AweSun Client) | ✅ 可用 |
 | `sunloginclient-nixos-module` | 向日葵远程控制 NixOS 模块（`services.sunloginclient.enable`） | ✅ 可用 |
 | `velotype` | [Velotype](https://github.com/manyougz/velotype) — 基于 Rust + GPUI 的原生 Markdown 编辑器 (WYSIWYG/源码) | ✅ 可用 |
@@ -41,9 +40,6 @@ nix run github:sgnay/sgnur-packages#univpn
 
 # 运行 NyaTerm
 nix run github:sgnay/sgnur-packages#nyaterm
-
-# 运行 Oh My Pi
-nix run github:sgnay/sgnur-packages#omp
 
 # 运行 Goose CLI
 nix run github:sgnay/sgnur-packages#goose
@@ -82,7 +78,6 @@ nix run github:sgnay/sgnur-packages#simple-ocr
   environment.systemPackages = [
     pkgs.nur.repos.sgnay.univpn
     pkgs.nur.repos.sgnay.nyaterm
-    pkgs.nur.repos.sgnay.omp
     pkgs.nur.repos.sgnay.sunloginclient
   ];
 }
@@ -99,7 +94,6 @@ in {
   environment.systemPackages = [
     pkgs'.univpn
     pkgs'.nyaterm
-    pkgs'.omp
     pkgs'.sunloginclient
   ];
 }
@@ -111,7 +105,6 @@ in {
 # 构建单个包
 nix-build -A univpn
 nix-build -A nyaterm
-nix-build -A omp
 nix-build -A sunloginclient
 
 # 检查评估
@@ -129,7 +122,6 @@ nix-env -f . -qa \* --meta --xml --drv-path --show-trace
 ├── pkgs/
 │   ├── univpn/            # UniVPN 包
 │   ├── nyaterm/           # NyaTerm 包
-│   ├── omp/               # Oh My Pi (omp) 包
 │   └── sunloginclient/    # 向日葵远程控制客户端包
 ├── nixos-modules/
 │   ├── default.nix        # NixOS 模块索引

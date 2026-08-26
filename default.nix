@@ -9,7 +9,6 @@
     zipFile = ./pkgs/univpn/univpn-linux-64-10781.19.0.1214.zip;
   };
   nyaterm = pkgs.callPackage ./pkgs/nyaterm { };
-  omp = pkgs.callPackage ./pkgs/omp { };
   sunloginclient = pkgs.callPackage ./pkgs/sunloginclient { };
   rustconn = pkgs.callPackage ./pkgs/rustconn { };
   oxideterm = pkgs.callPackage ./pkgs/oxideterm { };

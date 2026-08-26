@@ -25,8 +25,6 @@ sgnur-packages/
 │   │   ├── default.nix
 │   │   ├── Cargo.lock
 │   │   └── nyaterm.desktop.in
-│   ├── omp/                   # Oh My Pi — 终端原生 AI 编程助手
-│   │   └── default.nix
 │   └── sunloginclient/        # 向日葵远程控制客户端 (AweSun)
 │       └── default.nix
 ├── nixos-modules/
@@ -82,16 +80,7 @@ sgnur-packages/
   - 安装 `.desktop` 文件 + 256x256 图标 — 可从桌面环境启动
 - **注册**: `default.nix` → `pkgs.callPackage ./pkgs/nyaterm { }`
 
-### 4. Oh My Pi 包 (`pkgs/omp`)
-
-- **版本**: `16.5.0`
-- **描述**: [Oh My Pi (omp)](https://github.com/can1357/oh-my-pi) — 终端原生 AI 编程助手
-- **构建方式**:
-  - 直接下载官方预编译好的二进制文件 `omp-linux-x64`
-  - 使用 bash wrapper 脚本包装该二进制文件，动态链接到系统中的 `glibc` 与 `gcc.cc.lib`，实现免去 autoPatchelf 但依然支持 NixOS 运行环境。
-- **注册**: `default.nix` → `pkgs.callPackage ./pkgs/omp { }`
-
-### 5. 向日葵远程控制客户端 (`pkgs/sunloginclient`)
+### 4. 向日葵远程控制客户端 (`pkgs/sunloginclient`)
 
 - **版本**: `16.5.0.30560` (AweSun / Sunlogin Client)
 - **描述**: 专有远程控制软件 (Sunlogin)
@@ -102,7 +91,7 @@ sgnur-packages/
 - **注册**: `default.nix` → `pkgs.callPackage ./pkgs/sunloginclient { }`
 - **NixOS 模块**: `nixos-modules/sunloginclient.nix` (提供 `services.sunloginclient` 选项，配置 `programs.nix-ld.libraries` 确保环境就绪)
 
-### 6. Velotype 包 (`pkgs/velotype`)
+### 5. Velotype 包 (`pkgs/velotype`)
 
 - **版本**: `0.7.0`
 - **描述**: [Velotype](https://github.com/manyougz/velotype) — 基于 Rust + GPUI 的原生的 Markdown 编辑器，支持所见即所得 (WYSIWYG) 与源码编辑模式
@@ -112,14 +101,14 @@ sgnur-packages/
   - 安装 `.desktop` 桌面入口文件及多分辨率图标
 - **注册**: `default.nix` → `pkgs.callPackage ./pkgs/velotype { }`
 
-### 7. CI 流水线 (`.github/workflows/build.yml`)
+### 6. CI 流水线 (`.github/workflows/build.yml`)
 
 - **触发器**: PR、push 到 main/master、每日定时（02:51）、手动触发
 - **矩阵**: `nixpkgs-unstable`, `nixos-unstable`, `nixos-26.05`
 - **nurRepo**: `sgnur-packages`
 - **cachix**: 未配置（默认跳过）
 
-### 8. DeepSeek Reasonix 包 (`pkgs/deepseek-reasonix`)
+### 7. DeepSeek Reasonix 包 (`pkgs/deepseek-reasonix`)
 
 - **版本**: `1.25.1` (Reasonix Desktop)
 - **描述**: [DeepSeek Reasonix](https://github.com/esengine/deepseek-reasonix) — AI reasoning engine 桌面应用
@@ -140,9 +129,6 @@ nix run github:sgnay/sgnur-packages#univpn
 
 # 通过 Flake 运行 NyaTerm
 nix run github:sgnay/sgnur-packages#nyaterm
-
-# 通过 Flake 运行 Oh My Pi
-nix run github:sgnay/sgnur-packages#omp
 
 # 通过 Flake 运行 Sunlogin (AweSun)
 nix run github:sgnay/sgnur-packages#sunloginclient
@@ -189,7 +175,6 @@ nix-build -A velotype
 | 打包 sunloginclient | ✅ | 向日葵远程控制客户端 (AweSun)，版本 16.5.0 |
 | sunloginclient 混合打包 | ✅ | 后台守护进程 patchelf + 客户端 nix-ld，绕过完整性校验并解决 Systemd 变量清理问题 |
 | sunloginclient 服务模块 | ✅ | 一键开启 `services.sunloginclient`，配置全局 nix-ld 依赖支持 |
-| 打包 oh-my-pi | ✅ | Oh My Pi — 终端原生 AI 编程助手，免编译二进制包装 |
 | 宿主机密钥安全 | ✅ | 将 plaintext 敏感配置 secrets.nix 替换为 sops-nix 密钥密文管理，使用机器 SSH Host Key 动态解密 |
 | 打包 velotype | ✅ | Velotype — 基于 Rust + GPUI 的 Markdown 编辑器（版本 0.7.0） |
 | 打包 goose | ✅ | Goose — 开源、可扩展的 AI Agent CLI 工具（版本 1.45.0） |
