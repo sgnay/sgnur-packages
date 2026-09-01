@@ -38,11 +38,13 @@ rustPlatform.buildRustPackage rec {
   src = fetchFromGitHub {
     owner = "sgnay";
     repo = "simple-translation";
-    rev = "54e4cbc622925d4770b6350743ef7326cab0b94a";
-    hash = "sha256-42q3+oEEWEjCTOIqN36TEZE45jQVVcUoMKVaMPlLoc8=";
+    rev = "b4eceee3593a1d37e1cdf6050528084380fe3d39";
+    hash = "sha256-aaS+iHd98TCgSwgxz9/tbvtrBOyMd6pVXkoLMJOZ5cM=";
   };
 
-  cargoHash = "sha256-FKS34O38fMkZEplA6FJe8hseKjYTHw78pKGJfw71CB0=";
+  cargoLock = {
+    lockFile = ./Cargo.lock;
+  };
 
   nativeBuildInputs = [
     pkg-config

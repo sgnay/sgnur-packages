@@ -20,13 +20,13 @@ let
 in
 rustPlatform.buildRustPackage rec {
   pname = "simple-ocr";
-  version = "0.1.0";
+  version = "0.1.2";
 
   src = fetchFromGitHub {
     owner = "sgnay";
     repo = "simple-ocr";
     rev = "v${version}";
-    hash = "sha256-NGsT06c1z1Z22mM0uFot0bOJ5a838E/ZHCzsLRwU1xM=";
+    hash = "sha256-biPU9s9IQL6jPD5nk+MdQlz8n6YjY+oxMaBwwnCLMTU=";
   };
 
   cargoLock = {
