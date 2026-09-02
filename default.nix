@@ -10,7 +10,6 @@
   };
   nyaterm = pkgs.callPackage ./pkgs/nyaterm { };
   sunloginclient = pkgs.callPackage ./pkgs/sunloginclient { };
-  rustconn = pkgs.callPackage ./pkgs/rustconn { };
   oxideterm = pkgs.callPackage ./pkgs/oxideterm { };
   velotype = pkgs.callPackage ./pkgs/velotype { };
   goose = pkgs.callPackage ./pkgs/goose { };
