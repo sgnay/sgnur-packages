@@ -17,5 +17,4 @@
   simple-translation = pkgs.callPackage ./pkgs/simple-translation { };
   simple-ocr = pkgs.callPackage ./pkgs/simple-ocr { };
   deepseek-reasonix = pkgs.callPackage ./pkgs/deepseek-reasonix { };
-  ferrite = pkgs.callPackage ./pkgs/ferrite { };
 }
