@@ -12,7 +12,6 @@
   sunloginclient = pkgs.callPackage ./pkgs/sunloginclient { };
   oxideterm = pkgs.callPackage ./pkgs/oxideterm { };
   velotype = pkgs.callPackage ./pkgs/velotype { };
-  goose = pkgs.callPackage ./pkgs/goose { };
   goose-desktop = pkgs.callPackage ./pkgs/goose-desktop { };
   simple-translation = pkgs.callPackage ./pkgs/simple-translation { };
   simple-ocr = pkgs.callPackage ./pkgs/simple-ocr { };

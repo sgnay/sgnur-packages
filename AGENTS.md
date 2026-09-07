@@ -177,7 +177,6 @@ nix-build -A velotype
 | sunloginclient 服务模块 | ✅ | 一键开启 `services.sunloginclient`，配置全局 nix-ld 依赖支持 |
 | 宿主机密钥安全 | ✅ | 将 plaintext 敏感配置 secrets.nix 替换为 sops-nix 密钥密文管理，使用机器 SSH Host Key 动态解密 |
 | 打包 velotype | ✅ | Velotype — 基于 Rust + GPUI 的 Markdown 编辑器（版本 0.7.0） |
-| 打包 goose | ✅ | Goose — 开源、可扩展的 AI Agent CLI 工具（版本 1.45.0） |
 | 打包 goose-desktop | ✅ | Goose Desktop — 开源 AI Agent 桌面图形应用（版本 1.45.0） |
 | 打包 simple-translation | ✅ | Simple Translation — 基于 Rust + egui 的极简 Linux 桌面翻译工具（版本 0.1.2） |
 | 打包 deepseek-reasonix | ✅ | DeepSeek Reasonix — AI reasoning engine（版本待更新） |
