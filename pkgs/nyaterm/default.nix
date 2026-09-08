@@ -11,14 +11,14 @@
 }:
 
 let
- version = "1.2.5";
+  version = "1.2.9";
   pname = "nyaterm";
 
   src = fetchFromGitHub {
     owner = "nyakang";
     repo = "nyaterm";
- rev = "v1.2.5";
- hash = "sha256-EXz1FZsMutl4c47kxdCQah3Myr7M0EOsDDswq6pIYo4=";
+    rev = "v${version}";
+    hash = "sha256-7MIiVGyXVqQbPtTAZeVp7wsJkjKr/pHdH3z9eAHrZAs=";
   };
 
   # Pre-fetched pnpm dependencies
@@ -26,7 +26,7 @@ let
     inherit pname version src;
     pnpm = pnpm;
  fetcherVersion = 4;
- hash = "sha256-5b/eiTJ869ModMu+NqBxb+MNw1mCF54sObwtVKnI3EA=";
+    hash = "sha256-jave9+elbiJUsH6xEgh+ORaTnx3Uu0O0KH0TL7u8j/Q=";
   };
 in
 rustPlatform.buildRustPackage {
@@ -90,7 +90,18 @@ rustPlatform.buildRustPackage {
   # pnpmConfigHook already ran pnpm install in configurePhase,
   # so node_modules is ready at the source root.
   preBuild = ''
-    pnpm build
+    # Build frontend
+    pnpm exec tsc
+    pnpm exec vite build
+
+    # Create sidecar placeholder binary expected by tauri-build
+    mkdir -p src-tauri/binaries
+    target="x86_64-unknown-linux-gnu"
+    cat <<'EOF' > src-tauri/binaries/nyaterm-mcp-$target
+#!/bin/sh
+echo "nyaterm-mcp sidecar"
+EOF
+    chmod +x src-tauri/binaries/nyaterm-mcp-$target
   '';
 
   # buildRustPackage runs cargo build which produces the binary in
