@@ -16,7 +16,6 @@
 | `sunloginclient-nixos-module` | 向日葵远程控制 NixOS 模块（`services.sunloginclient.enable`） | ✅ 可用 |
 | `velotype` | [Velotype](https://github.com/manyougz/velotype) — 基于 Rust + GPUI 的原生 Markdown 编辑器 (WYSIWYG/源码) | ✅ 可用 |
 | `goose-desktop` | [Goose Desktop](https://github.com/aaif-goose/goose) — Goose AI Agent 桌面图形应用 | ✅ 可用 |
-| `simple-ocr` | [Simple OCR](https://github.com/sgnay/simple-ocr) — Simple Linux desktop OCR application using GPUI | ✅ 可用 |
 
 ## 使用方式
 
@@ -41,9 +40,6 @@ nix run github:sgnay/sgnur-packages#nyaterm
 
 # 运行 Goose Desktop
 nix run github:sgnay/sgnur-packages#goose-desktop
-
-# 运行 Simple OCR
-nix run github:sgnay/sgnur-packages#simple-ocr
 ```
 
 #### 作为 NixOS 模块启用
