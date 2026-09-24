@@ -154,7 +154,7 @@ nix run github:sgnay/sgnur-packages#deepseek-reasonix
 }
 
 # 本地构建
-nix-build -A velotype
+nix build .#velotype
 ```
 
 ## 已完成的改进
@@ -178,7 +178,6 @@ nix-build -A velotype
 | 宿主机密钥安全 | ✅ | 将 plaintext 敏感配置 secrets.nix 替换为 sops-nix 密钥密文管理，使用机器 SSH Host Key 动态解密 |
 | 打包 velotype | ✅ | Velotype — 基于 Rust + GPUI 的 Markdown 编辑器（版本 0.7.0） |
 | 打包 goose-desktop | ✅ | Goose Desktop — 开源 AI Agent 桌面图形应用（版本 1.45.0） |
-| 打包 simple-translation | ✅ | Simple Translation — 基于 Rust + egui 的极简 Linux 桌面翻译工具（版本 0.1.2） |
 | 打包 deepseek-reasonix | ✅ | DeepSeek Reasonix — AI reasoning engine（版本待更新） |
 
 ## 后续建议
@@ -205,6 +204,7 @@ nix-build -A velotype
 
 ### 禁止操作
 - **永远不要执行 `git push`**。用户已明确要求，commit 后由用户自行推送。
+- **构建使用现代化 `nix build` CLI**（如 `nix build .#<pkg>`），尽量不要再使用 `nix-build`。用户已明确要求（2026-09-24）。
 
 ### 版本更新常见错误
 
@@ -219,7 +219,7 @@ error: hash mismatch in fixed-output derivation ...
 ```
 
 **正确做法**：
-1. 直接让 nix-build 报错，从输出中读取 `got:` 行获取新哈希
+1. 直接让 nix build 报错，从输出中读取 `got:` 行获取新哈希
 2. 不要手动用 `nix-prefetch-url` 计算（它返回的是 tarball 哈希，而 `fetchFromGitHub` 需要 NAR 哈希，两者不同）
 3. 用 `got:` 的值替换 `sha256` 字段
 
@@ -234,7 +234,7 @@ error: fetchPnpmDeps `fetcherVersion = 3` is no longer supported for `pnpm_11`.
 
 **正确做法**：
 - 将 `fetcherVersion = 3` 改为 `fetcherVersion = 4`
-- 同时更新 `hash`（再次让 nix-build 报错，取 `got:` 值）
+- 同时更新 `hash`（再次让 nix build 报错，取 `got:` 值）
 - **不要** 使用 `fetcherVersion = 5`（当前 nixpkgs 尚未支持）
 
 #### 3. `cargoLock.lockFile` 需要与上游版本同步
@@ -261,8 +261,8 @@ ERROR: cargoHash or cargoSha256 is out of date
 
 | 场景 | 命令 / 方法 |
 |---|---|
-| `fetchurl`（tar.gz / .deb）哈希 | 运行 `nix-build`，从 `got: sha256-...` 取新值 |
-| `fetchFromGitHub` 源哈希 | 运行 `nix-build`，从 `got: sha256-...` 取新值 |
-| `fetchPnpmDeps` 哈希 | 更新 `fetcherVersion` 后运行 `nix-build`，从 `got: sha256-...` 取新值 |
-| `cargoHash` | 运行 `nix-build`，从 `got: sha256-...` 取新值 |
+| `fetchurl`（tar.gz / .deb）哈希 | 运行 `nix build`，从 `got: sha256-...` 取新值 |
+| `fetchFromGitHub` 源哈希 | 运行 `nix build`，从 `got: sha256-...` 取新值 |
+| `fetchPnpmDeps` 哈希 | 更新 `fetcherVersion` 后运行 `nix build`，从 `got: sha256-...` 取新值 |
+| `cargoHash` | 运行 `nix build`，从 `got: sha256-...` 取新值 |
 | `nix-prefetch-url` | 返回 base32 NAR 哈希，**不适用于** `fetchFromGitHub` 的 SRI 格式 |
