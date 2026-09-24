@@ -16,7 +16,6 @@
 | `sunloginclient-nixos-module` | 向日葵远程控制 NixOS 模块（`services.sunloginclient.enable`） | ✅ 可用 |
 | `velotype` | [Velotype](https://github.com/manyougz/velotype) — 基于 Rust + GPUI 的原生 Markdown 编辑器 (WYSIWYG/源码) | ✅ 可用 |
 | `goose-desktop` | [Goose Desktop](https://github.com/aaif-goose/goose) — Goose AI Agent 桌面图形应用 | ✅ 可用 |
-| `simple-translation` | [Simple Translation](https://github.com/sgnay/simple-translation) — 基于 Rust + egui 的极简 Linux 桌面翻译工具 | ✅ 可用 |
 | `simple-ocr` | [Simple OCR](https://github.com/sgnay/simple-ocr) — Simple Linux desktop OCR application using GPUI | ✅ 可用 |
 
 ## 使用方式
@@ -42,9 +41,6 @@ nix run github:sgnay/sgnur-packages#nyaterm
 
 # 运行 Goose Desktop
 nix run github:sgnay/sgnur-packages#goose-desktop
-
-# 运行 Simple Translation
-nix run github:sgnay/sgnur-packages#simple-translation
 
 # 运行 Simple OCR
 nix run github:sgnay/sgnur-packages#simple-ocr
@@ -99,9 +95,9 @@ in {
 
 ```bash
 # 构建单个包
-nix-build -A univpn
-nix-build -A nyaterm
-nix-build -A sunloginclient
+nix build .#univpn
+nix build .#nyaterm
+nix build .#sunloginclient
 
 # 检查评估
 nix-env -f . -qa \* --meta --xml --drv-path --show-trace

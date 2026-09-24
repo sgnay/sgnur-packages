@@ -13,7 +13,6 @@
   oxideterm = pkgs.callPackage ./pkgs/oxideterm { };
   velotype = pkgs.callPackage ./pkgs/velotype { };
   goose-desktop = pkgs.callPackage ./pkgs/goose-desktop { };
-  simple-translation = pkgs.callPackage ./pkgs/simple-translation { };
   simple-ocr = pkgs.callPackage ./pkgs/simple-ocr { };
   deepseek-reasonix = pkgs.callPackage ./pkgs/deepseek-reasonix { };
 }
