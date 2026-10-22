@@ -21,10 +21,6 @@ sgnur-packages/
 │   ├── univpn/                # UniVPN 客户端包
 │   │   ├── default.nix
 │   │   └── univpn-linux-64-10781.19.0.1214.zip
-│   ├── nyaterm/               # NyaTerm — 现代远程终端工作区
-│   │   ├── default.nix
-│   │   ├── Cargo.lock
-│   │   └── nyaterm.desktop.in
 │   └── sunloginclient/        # 向日葵远程控制客户端 (AweSun)
 │       └── default.nix
 ├── nixos-modules/
@@ -57,30 +53,7 @@ sgnur-packages/
 - **功能**: 部署到 `/usr/local/UniVPN/`、启动 wrapper、setuid 权限、Qt5 清理、桌面入口
 - **注册**: `nixos-modules/default.nix`
 
-### 3. NyaTerm 包 (`pkgs/nyaterm`)
-
-- **版本**: `1.1.16`（基于 GitHub Tag `v1.1.16`）
-- **描述**: [NyaTerm](https://nyaterm.app) — 基于 Tauri 2 + React + Rust 的现代远程终端工作区
-- **功能**: SSH 客户端、本地终端、Telnet、串口、SFTP、OTP、SSH 隧道、AI 辅助、加密同步
-- **架构**:
-  - **前端**: React 19 + TypeScript + Vite 7（pnpm 构建，644 个 npm 包）
-  - **后端**: Rust + Tauri 2（Russh SSH、portable-pty 等，882 个 crate）
-- **构建方式**:
-  1. `fetchPnpmDeps` 预取所有 pnpm 依赖
-  2. `pnpmConfigHook` 在 configure 阶段安装 node_modules
-  3. `preBuild` 运行 `pnpm build` 构建前端 → 生成 `dist/`
-  4. `buildRustPackage` + `cargoLock.lockFile` 编译 Rust 后端
-- **系统依赖** (buildInputs): `webkitgtk_4_1`, `libsoup_3`, `gtk3`, `glib`, `cairo`, `gdk-pixbuf`, `pango`, `atk`, `libxcb`, `libx11`, `libxkbcommon`, `freetype`, `fontconfig`, `dbus`, `openssl`, `zlib`, `brotli`, `libappindicator-gtk3`, `librsvg`, `udev`, `gsettings-desktop-schemas`
-- **特殊处理**:
-  - `doCheck = false` — 沙箱中并发数据库访问导致测试失败
-  - `cargoLock.lockFile = ./Cargo.lock` — Cargo.lock 从上游复制到包目录
-  - 使用 `buildAndTestSubdir = "src-tauri"` 确保 cargo 在正确的目录构建
-  - `postPatch` 添加 `custom-protocol` feature — 使 app 使用内嵌前端资源而非 dev server URL
-  - `wrapProgram` 设置 `GDK_BACKEND=x11` — 改善 Wayland 下字体渲染
-  - 安装 `.desktop` 文件 + 256x256 图标 — 可从桌面环境启动
-- **注册**: `default.nix` → `pkgs.callPackage ./pkgs/nyaterm { }`
-
-### 4. 向日葵远程控制客户端 (`pkgs/sunloginclient`)
+### 3. 向日葵远程控制客户端 (`pkgs/sunloginclient`)
 
 - **版本**: `16.5.0.30560` (AweSun / Sunlogin Client)
 - **描述**: 专有远程控制软件 (Sunlogin)
@@ -91,7 +64,7 @@ sgnur-packages/
 - **注册**: `default.nix` → `pkgs.callPackage ./pkgs/sunloginclient { }`
 - **NixOS 模块**: `nixos-modules/sunloginclient.nix` (提供 `services.sunloginclient` 选项，配置 `programs.nix-ld.libraries` 确保环境就绪)
 
-### 5. Velotype 包 (`pkgs/velotype`)
+### 4. Velotype 包 (`pkgs/velotype`)
 
 - **版本**: `0.7.0`
 - **描述**: [Velotype](https://github.com/manyougz/velotype) — 基于 Rust + GPUI 的原生的 Markdown 编辑器，支持所见即所得 (WYSIWYG) 与源码编辑模式
@@ -101,14 +74,14 @@ sgnur-packages/
   - 安装 `.desktop` 桌面入口文件及多分辨率图标
 - **注册**: `default.nix` → `pkgs.callPackage ./pkgs/velotype { }`
 
-### 6. CI 流水线 (`.github/workflows/build.yml`)
+### 5. CI 流水线 (`.github/workflows/build.yml`)
 
 - **触发器**: PR、push 到 main/master、每日定时（02:51）、手动触发
 - **矩阵**: `nixpkgs-unstable`, `nixos-unstable`, `nixos-26.05`
 - **nurRepo**: `sgnur-packages`
 - **cachix**: 未配置（默认跳过）
 
-### 7. DeepSeek Reasonix 包 (`pkgs/deepseek-reasonix`)
+### 6. DeepSeek Reasonix 包 (`pkgs/deepseek-reasonix`)
 
 - **版本**: `1.25.1` (Reasonix Desktop)
 - **描述**: [DeepSeek Reasonix](https://github.com/esengine/deepseek-reasonix) — AI reasoning engine 桌面应用
@@ -126,9 +99,6 @@ sgnur-packages/
 ```bash
 # 通过 Flake 运行 UniVPN
 nix run github:sgnay/sgnur-packages#univpn
-
-# 通过 Flake 运行 NyaTerm
-nix run github:sgnay/sgnur-packages#nyaterm
 
 # 通过 Flake 运行 Sunlogin (AweSun)
 nix run github:sgnay/sgnur-packages#sunloginclient
@@ -168,10 +138,6 @@ nix build .#velotype
 | NixOS 模块引用包 | ✅ | 改为使用 `pkgs.univpn`，消除构建逻辑重复 |
 | 注册 univpn 到 default.nix | ✅ | 通过 `pkgs.callPackage` 加载 |
 | 重写 README.md | ✅ | 替换为项目真实描述 |
-| 打包 nyaterm | ✅ | NyaTerm — 现代远程终端工作区 |
-| nyaterm .desktop 文件 | ✅ | 含图标，可从桌面启动器打开 |
-| nyaterm custom-protocol | ✅ | 修复空窗口问题（使用内嵌前端资源） |
-| nyaterm 字体渲染 | ✅ | 设置 GDK_BACKEND=x11 改善模糊问题 |
 | 打包 sunloginclient | ✅ | 向日葵远程控制客户端 (AweSun)，版本 16.5.0 |
 | sunloginclient 混合打包 | ✅ | 后台守护进程 patchelf + 客户端 nix-ld，绕过完整性校验并解决 Systemd 变量清理问题 |
 | sunloginclient 服务模块 | ✅ | 一键开启 `services.sunloginclient`，配置全局 nix-ld 依赖支持 |
@@ -187,8 +153,6 @@ nix build .#velotype
 | 配置 Cachix 缓存 | 低 | 如需加速 CI，创建 Cachix 账号并在 GitHub Secrets 中设置密钥 |
 | 补充 `lib/` 函数 | 低 | 当前为空，有通用 Nix 函数时可放入 |
 | 补充 `overlays/` | 低 | 当前为空，有额外 overlay 时可放入 |
-| nyaterm NixOS 模块 | 中 | 可创建 NixOS 模块以集成桌面文件、DBus 服务等 |
-| nyaterm 版本更新 | 持续 | 当上游发布新 Tag 时，需更新 Tag 版本、源哈希、pnpmDeps 哈希及 Cargo.lock |
 | sunloginclient 版本更新 | 持续 | 官方升级时及时跟进 Deb 地址与 SHA256 校验码 |
 
 ## GUI 应用打包与 Launcher 兼容性指南 (Desktop Launcher Packaging Rules)

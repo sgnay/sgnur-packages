@@ -8,9 +8,7 @@
   univpn = pkgs.callPackage ./pkgs/univpn {
     zipFile = ./pkgs/univpn/univpn-linux-64-10781.19.0.1214.zip;
   };
-  nyaterm = pkgs.callPackage ./pkgs/nyaterm { };
   sunloginclient = pkgs.callPackage ./pkgs/sunloginclient { };
-  oxideterm = pkgs.callPackage ./pkgs/oxideterm { };
   velotype = pkgs.callPackage ./pkgs/velotype { };
   goose-desktop = pkgs.callPackage ./pkgs/goose-desktop { };
   deepseek-reasonix = pkgs.callPackage ./pkgs/deepseek-reasonix { };

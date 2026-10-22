@@ -10,8 +10,6 @@
 |---|---|---|
 | `univpn` | Leagsoft UniVPN 客户端 | ✅ 可用 |
 | `univpn-nixos-module` | UniVPN NixOS 模块（`services.univpn.enable`） | ✅ 可用 |
-| `nyaterm` | [NyaTerm](https://nyaterm.app) — 现代远程终端工作区（SSH / SFTP / Telnet / Serial） | ✅ 可用 |
-| `nyaterm.desktop` | NyaTerm 桌面入口文件（含图标，可从应用菜单启动） | ✅ 自动安装 |
 | `sunloginclient` | 向日葵远程控制客户端 (AweSun Client) | ✅ 可用 |
 | `sunloginclient-nixos-module` | 向日葵远程控制 NixOS 模块（`services.sunloginclient.enable`） | ✅ 可用 |
 | `velotype` | [Velotype](https://github.com/manyougz/velotype) — 基于 Rust + GPUI 的原生 Markdown 编辑器 (WYSIWYG/源码) | ✅ 可用 |
@@ -34,9 +32,6 @@
 ```bash
 # 运行 UniVPN
 nix run github:sgnay/sgnur-packages#univpn
-
-# 运行 NyaTerm
-nix run github:sgnay/sgnur-packages#nyaterm
 
 # 运行 Goose Desktop
 nix run github:sgnay/sgnur-packages#goose-desktop
@@ -65,7 +60,6 @@ nix run github:sgnay/sgnur-packages#goose-desktop
   # 示例：通过 NUR 引入包
   environment.systemPackages = [
     pkgs.nur.repos.sgnay.univpn
-    pkgs.nur.repos.sgnay.nyaterm
     pkgs.nur.repos.sgnay.sunloginclient
   ];
 }
@@ -81,7 +75,6 @@ let
 in {
   environment.systemPackages = [
     pkgs'.univpn
-    pkgs'.nyaterm
     pkgs'.sunloginclient
   ];
 }
@@ -92,7 +85,6 @@ in {
 ```bash
 # 构建单个包
 nix build .#univpn
-nix build .#nyaterm
 nix build .#sunloginclient
 
 # 检查评估
@@ -109,7 +101,6 @@ nix-env -f . -qa \* --meta --xml --drv-path --show-trace
 ├── ci.nix                 # CI 构建定义
 ├── pkgs/
 │   ├── univpn/            # UniVPN 包
-│   ├── nyaterm/           # NyaTerm 包
 │   └── sunloginclient/    # 向日葵远程控制客户端包
 ├── nixos-modules/
 │   ├── default.nix        # NixOS 模块索引
