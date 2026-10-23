@@ -11,7 +11,7 @@
 
 ```
 sgnur-packages/
-├── flake.nix                  # Nix Flake 入口，暴露 legacyPackages / packages / nixosModules
+├── flake.nix                  # Nix Flake 入口，暴露 legacyPackages / packages / nixosModules / homeModules
 ├── flake.lock                 # Flake 锁定文件（nixpkgs-unstable）
 ├── default.nix                # 主入口，返回 packages、lib、nixosModules、overlays
 ├── overlay.nix                # nixpkgs overlay
@@ -21,12 +21,21 @@ sgnur-packages/
 │   ├── univpn/                # UniVPN 客户端包
 │   │   ├── default.nix
 │   │   └── univpn-linux-64-10781.19.0.1214.zip
-│   └── sunloginclient/        # 向日葵远程控制客户端 (AweSun)
+│   ├── sunloginclient/        # 向日葵远程控制客户端 (AweSun)
+│   │   └── default.nix
+│   ├── velotype/              # Velotype Markdown 编辑器
+│   ├── goose-desktop/         # Goose Desktop AI Agent
+│   ├── deepseek-reasonix/     # DeepSeek Reasonix
+│   └── fcitx5-windinput/      # 清风输入法 (WindInput) Fcitx5 引擎
 │       └── default.nix
 ├── nixos-modules/
 │   ├── default.nix            # NixOS 模块集合
 │   ├── univpn.nix             # UniVPN NixOS 模块（使用 pkgs.univpn）
-│   └── sunloginclient.nix     # 向日葵远程控制 NixOS 模块
+│   ├── sunloginclient.nix     # 向日葵远程控制 NixOS 模块
+│   └── fcitx5-windinput.nix   # 清风输入法 NixOS 模块
+├── home-modules/
+│   ├── default.nix            # Home Manager 模块集合
+│   └── fcitx5-windinput.nix   # 清风输入法 HM 模块（注册 addon）
 ├── lib/
 │   └── default.nix            # 库函数（当前为空占位）
 ├── overlays/
@@ -94,6 +103,25 @@ sgnur-packages/
 - **许可**: Unfree (专有软件)
 - **注册**: `default.nix` → `pkgs.callPackage ./pkgs/deepseek-reasonix { }`
 
+### 7. 清风输入法 (`pkgs/fcitx5-windinput`)
+
+- **版本**: `0.127.0`
+- **描述**: [清风输入法 (WindInput)](https://windinput.com) — 基于 Rust 服务 + Fcitx5 addon 的输入法引擎
+- **构建方式 (官方 deb 重打包)**:
+  - 上游 Linux 只发布 `.deb`（amd64 / arm64），词库 68 MB 由上游构建期生成 → 不做全源码打包
+  - `dpkg-deb -x` 解压 → `autoPatchelfHook` 修复 RPATH → 重排目录
+  - `dontStrip = true`：保留上游已 strip 的二进制
+- **安装布局**:
+  - `$out/lib/windinput/{wind_input,wind_setting,data/}` — 服务、设置程序、词库；服务按 exe 同目录找 `data/`
+  - `$out/lib/fcitx5/libwindinput.so` — Fcitx5 addon（deb 的 multiarch 目录重排）
+  - `$out/share/fcitx5/{addon,inputmethod}/windinput.conf` — addon / 输入法描述
+  - `$out/share/{applications,icons,mime,doc,licenses}` — 桌面入口、图标、MIME、README、LICENSE
+  - `$out/bin/{wind_input,wind_setting}` — symlink 入口
+- **dlopen 依赖**: `fontconfig`（服务与设置）、`dbus-1` / `libxkbcommon`（设置程序）通过 `runtimeDependencies` 写入 RPATH
+- **NixOS 模块**: `nixos-modules/fcitx5-windinput.nix`（`services.fcitx5-windinput.enable`）— 用 tmpfiles 物化 `/usr/lib/windinput` 符号链接，并设置 `WIND_INPUT_SERVICE` / `WIND_INPUT_SETTING`
+- **Home Manager 模块**: `home-modules/fcitx5-windinput.nix` — 注册 `i18n.inputMethod.fcitx5.addons`，设置 session 变量
+- **注册**: `default.nix` → `pkgs.callPackage ./pkgs/fcitx5-windinput { }`；`nixos-modules/default.nix`；`flake.nix` → `homeModules`
+
 ## 使用方式
 
 ```bash
@@ -123,8 +151,20 @@ nix run github:sgnay/sgnur-packages#deepseek-reasonix
   services.sunloginclient.enable = true;
 }
 
+# 通过 NixOS 模块启用清风输入法
+{
+  imports = [ inputs.sgnur-packages.nixosModules.fcitx5-windinput ];
+  services.fcitx5-windinput.enable = true;
+}
+
+# Home Manager（推荐）：注册 addon + 环境变量
+{
+  imports = [ inputs.sgnur-packages.homeModules.fcitx5-windinput ];
+}
+
 # 本地构建
 nix build .#velotype
+nix build .#fcitx5-windinput
 ```
 
 ## 已完成的改进
@@ -145,6 +185,8 @@ nix build .#velotype
 | 打包 velotype | ✅ | Velotype — 基于 Rust + GPUI 的 Markdown 编辑器（版本 0.7.0） |
 | 打包 goose-desktop | ✅ | Goose Desktop — 开源 AI Agent 桌面图形应用（版本 1.45.0） |
 | 打包 deepseek-reasonix | ✅ | DeepSeek Reasonix — AI reasoning engine（版本待更新） |
+| 打包 fcitx5-windinput | ✅ | 清风输入法 (WindInput) — 官方 deb 重打包（版本 0.127.0） |
+| windinput NixOS / HM 模块 | ✅ | `services.fcitx5-windinput.enable` + `homeModules.fcitx5-windinput`（注册 addon） |
 
 ## 后续建议
 
@@ -154,6 +196,8 @@ nix build .#velotype
 | 补充 `lib/` 函数 | 低 | 当前为空，有通用 Nix 函数时可放入 |
 | 补充 `overlays/` | 低 | 当前为空，有额外 overlay 时可放入 |
 | sunloginclient 版本更新 | 持续 | 官方升级时及时跟进 Deb 地址与 SHA256 校验码 |
+| fcitx5-windinput 版本更新 | 持续 | 同步 amd64 / arm64 / LICENSE 三个 hash；上游 fcitx5 SONAME 变化时需改源码编译 addon |
+| windinput 实机验证 | 待做 | addon 结构 / 服务启动已离线验证；Wayland 候选窗与打字需在 niri 会话内验证 |
 
 ## GUI 应用打包与 Launcher 兼容性指南 (Desktop Launcher Packaging Rules)
 
@@ -221,6 +265,30 @@ ERROR: cargoHash or cargoSha256 is out of date
 2. 确认每个包构建成功后再统一提交
 3. 不要一次性修改所有包的版本号而不验证
 
+#### 5. Fcitx5 addon 打包（deb 重打包）
+
+**症状**：addon `ldd` 全部解析，但设置程序静默失败 / 候选窗字体异常。
+
+**原因**：`fontconfig`、`dbus-1`、`libxkbcommon` 是 `dlopen` 依赖，不在 `DT_NEEDED` 里；`autoPatchelfHook` 不会自动补齐。
+
+**正确做法**：
+- 把这些库放进 `runtimeDependencies`（会写入 RPATH），而不是只放 `buildInputs`
+- 用 `patchelf --print-rpath` + `ldd` 双重确认
+
+#### 6. Fcitx5 addon 的目录约定
+
+- addon 描述文件：`$out/share/fcitx5/addon/<name>.conf`
+- 输入法描述：`$out/share/fcitx5/inputmethod/<name>.conf`
+- 共享库：`$out/lib/fcitx5/lib<name>.so`（`Library=lib<name>` 对应文件名）
+- `FCITX_ADDON_DIRS` 指向**库目录**；`XDG_DATA_DIRS` 指向 `share`（fcitx5 会自动追加 `/fcitx5`）
+- `OnDemand=True` 的 addon **不会在启动时 dlopen**；无窗口焦点时 `fcitx5-remote -s <name>` 也不会触发加载。离线只能验证 conf 解析与路径合并，实际打字必须在图形会话内验证
+
+#### 7. WindInput 的路径约束
+
+- `wind_input` 按 **exe 所在目录** 查找 `data/` → 必须保持 `lib/windinput/{wind_input,data}` 布局，不能用 `install -Dm755` 拆开
+- addon 默认硬编码 `/usr/lib/windinput/{wind_input,wind_setting}`，但支持 `WIND_INPUT_SERVICE` / `WIND_INPUT_SETTING` 覆盖 → NixOS 模块用 tmpfiles 建符号链接 + 环境变量双保险
+- `.desktop` 内的 `Exec=/usr/lib/windinput/wind_setting` 需要 `substituteInPlace` 换成 store 路径
+
 ### 哈希获取速查表
 
 | 场景 | 命令 / 方法 |
@@ -230,3 +298,4 @@ ERROR: cargoHash or cargoSha256 is out of date
 | `fetchPnpmDeps` 哈希 | 更新 `fetcherVersion` 后运行 `nix build`，从 `got: sha256-...` 取新值 |
 | `cargoHash` | 运行 `nix build`，从 `got: sha256-...` 取新值 |
 | `nix-prefetch-url` | 返回 base32 NAR 哈希，**不适用于** `fetchFromGitHub` 的 SRI 格式 |
+| 官方 `.sha256` 文件（hex）转 SRI | `nix hash convert --hash-algo sha256 --to sri <hex>` |

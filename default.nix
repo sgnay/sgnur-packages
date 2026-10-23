@@ -12,4 +12,5 @@
   velotype = pkgs.callPackage ./pkgs/velotype { };
   goose-desktop = pkgs.callPackage ./pkgs/goose-desktop { };
   deepseek-reasonix = pkgs.callPackage ./pkgs/deepseek-reasonix { };
+  fcitx5-windinput = pkgs.callPackage ./pkgs/fcitx5-windinput { };
 }
