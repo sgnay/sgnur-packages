@@ -26,8 +26,9 @@ sgnur-packages/
 │   ├── velotype/              # Velotype Markdown 编辑器
 │   ├── goose-desktop/         # Goose Desktop AI Agent
 │   ├── deepseek-reasonix/     # DeepSeek Reasonix
-│   └── fcitx5-windinput/      # 清风输入法 (WindInput) Fcitx5 引擎
-│       └── default.nix
+│   └── fcitx5-windinput/      # 清风输入法 (WindInput) Fcitx5 引擎（源码构建）
+│       ├── default.nix
+│       └── source-date-epoch.patch
 ├── nixos-modules/
 │   ├── default.nix            # NixOS 模块集合
 │   ├── univpn.nix             # UniVPN NixOS 模块（使用 pkgs.univpn）
@@ -105,19 +106,16 @@ sgnur-packages/
 
 ### 7. 清风输入法 (`pkgs/fcitx5-windinput`)
 
-- **版本**: `0.127.0`
-- **描述**: [清风输入法 (WindInput)](https://windinput.com) — 基于 Rust 服务 + Fcitx5 addon 的输入法引擎
-- **构建方式 (官方 deb 重打包)**:
-  - 上游 Linux 只发布 `.deb`（amd64 / arm64），词库 68 MB 由上游构建期生成 → 不做全源码打包
-  - `dpkg-deb -x` 解压 → `autoPatchelfHook` 修复 RPATH → 重排目录
-  - `dontStrip = true`：保留上游已 strip 的二进制
-- **安装布局**:
-  - `$out/lib/windinput/{wind_input,wind_setting,data/}` — 服务、设置程序、词库；服务按 exe 同目录找 `data/`
-  - `$out/lib/fcitx5/libwindinput.so` — Fcitx5 addon（deb 的 multiarch 目录重排）
-  - `$out/share/fcitx5/{addon,inputmethod}/windinput.conf` — addon / 输入法描述
-  - `$out/share/{applications,icons,mime,doc,licenses}` — 桌面入口、图标、MIME、README、LICENSE
-  - `$out/bin/{wind_input,wind_setting}` — symlink 入口
-- **dlopen 依赖**: `fontconfig`（服务与设置）、`dbus-1` / `libxkbcommon`（设置程序）通过 `lib.getLib` 后的 `runtimeDependencies` 写入 RPATH
+- **版本**: `0.127.0`（全源码构建）
+- **源码**: `WindInput` v0.127.0 + `wind-setting` v0.127.0 + `wind-ui-rust` v0.25.0（设置程序经 path 依赖引用后两者）
+- **构建组件**:
+  - 服务：`cargo build -p wind_service --features linux-host`（edition 2024，release LTO）
+  - 设置程序：独立仓 `wind-setting`，构建时需要 `../WindInput` 与 `../wind-ui-rust` 兄弟目录布局
+  - addon：CMake + Fcitx5 5.0+、libxcb（xcb/shape/randr）、wayland-client、wayland-scanner；Wayland 候选窗走 input-method-v2
+  - 词库：固定 rev 拉取 rime-frost / pinyin-data / OpenCC / rime-wubi86-jidian / rime-lua-aux-code / hanzi-chars / rime-stroke / rime-emoji，用 `wind-tools` 的 `gen_unigram` / `gen_pinyin` / `gen_opencc` / `gen_dict` / `gen_aux_code` 生成，再按 `scripts/dev.sh gd` 的布局组装
+- **可复现性**: `source-date-epoch.patch` 让服务构建戳优先 `SOURCE_DATE_EPOCH`；`gen_dict --version-date 2026-10-20`
+- **输出布局**: 与 deb 版一致（`lib/windinput/{wind_input,wind_setting,data}`、`lib/fcitx5/libwindinput.so`、`share/fcitx5/*`、`bin/*`）
+- **dlopen**: 服务/设置程序分别 dlopen fontconfig / dbus / xkbcommon，最终包用 `autoPatchelfHook` + `runtimeDependencies = map lib.getLib [...]` 写入 RPATH
 - **NixOS 模块**: `nixos-modules/fcitx5-windinput.nix`（`services.fcitx5-windinput.enable`）— 用 tmpfiles 物化 `/usr/lib/windinput` 符号链接，并设置 `WIND_INPUT_SERVICE` / `WIND_INPUT_SETTING`
 - **Home Manager 模块**: `home-modules/fcitx5-windinput.nix` — 注册 `i18n.inputMethod.fcitx5.addons`，创建 `~/.local/state/windinput` 稳定符号链接，session 变量指向该稳定路径
 - **注册**: `default.nix` → `pkgs.callPackage ./pkgs/fcitx5-windinput { }`；`nixos-modules/default.nix`；`flake.nix` → `homeModules`
@@ -185,7 +183,7 @@ nix build .#fcitx5-windinput
 | 打包 velotype | ✅ | Velotype — 基于 Rust + GPUI 的 Markdown 编辑器（版本 0.7.0） |
 | 打包 goose-desktop | ✅ | Goose Desktop — 开源 AI Agent 桌面图形应用（版本 1.45.0） |
 | 打包 deepseek-reasonix | ✅ | DeepSeek Reasonix — AI reasoning engine（版本待更新） |
-| 打包 fcitx5-windinput | ✅ | 清风输入法 (WindInput) — 官方 deb 重打包（版本 0.127.0） |
+| 打包 fcitx5-windinput | ✅ | 清风输入法 (WindInput) — 全源码构建（服务 + 设置 + addon + 词库生成，版本 0.127.0） |
 | windinput NixOS / HM 模块 | ✅ | `services.fcitx5-windinput.enable` + `homeModules.fcitx5-windinput`（注册 addon） |
 
 ## 后续建议
@@ -196,7 +194,7 @@ nix build .#fcitx5-windinput
 | 补充 `lib/` 函数 | 低 | 当前为空，有通用 Nix 函数时可放入 |
 | 补充 `overlays/` | 低 | 当前为空，有额外 overlay 时可放入 |
 | sunloginclient 版本更新 | 持续 | 官方升级时及时跟进 Deb 地址与 SHA256 校验码 |
-| fcitx5-windinput 版本更新 | 持续 | 同步 amd64 / arm64 / LICENSE 三个 hash；上游 fcitx5 SONAME 变化时需改源码编译 addon |
+| fcitx5-windinput 版本更新 | 持续 | 同步 3 个源码仓 rev + 8 个数据仓 rev + rime-frost 28 个 hash + `--version-date` |
 | windinput 实机验证 | 待做 | addon 结构 / 服务启动已离线验证；Wayland 候选窗与打字需在 niri 会话内验证 |
 
 ## GUI 应用打包与 Launcher 兼容性指南 (Desktop Launcher Packaging Rules)
@@ -290,6 +288,14 @@ ERROR: cargoHash or cargoSha256 is out of date
 - addon 默认硬编码 `/usr/lib/windinput/{wind_input,wind_setting}`，但支持 `WIND_INPUT_SERVICE` / `WIND_INPUT_SETTING` 覆盖 → NixOS 模块用 tmpfiles 建符号链接 + 环境变量双保险
 - `.desktop` 内的 `Exec=/usr/lib/windinput/wind_setting` 需要 `substituteInPlace` 换成 store 路径
 - 升级包后：旧 `wind_input` 进程仍跑旧 store 路径，且 session 中的 `WIND_INPUT_SERVICE` 不会自动刷新 → 必须 `pkill -f /windinput/wind_input` 并重启 fcitx5；HM 模块用 `~/.local/state/windinput` 稳定符号链接规避环境变量失效
+
+#### 8. WindInput 全源码构建
+
+- `wind-setting` 的 path 依赖是 `../WindInput/wind_input/...` 与 `../wind-ui-rust`；`buildRustPackage` 的 `src` 必须是包含三仓兄弟目录的树，`cargoRoot` / `buildAndTestSubdir` 指向 `wind-setting`
+- `wind-tools` 的 `gen_dict` 默认配置路径来自编译期 `CARGO_MANIFEST_DIR`，Nix 构建中不存在 → 必须显式 `--config .../apps/wind-tools/data/gen_dict/gen_dict.toml`
+- `gen_dict` 默认用当天日期写词库版本戳 → 传 `--version-date` 固定；服务 `build.rs` 用 `SystemTime::now()` → `source-date-epoch.patch` 改为优先 `SOURCE_DATE_EPOCH`
+- 数据源全是 moving branch：`default.nix` 里按 rev 固定 URL；升级时同时更新 3 个源码仓 + 8 个数据仓 rev 与 rime-frost 的 28 个 hash
+- 首次冷构建约 10 分钟（服务 ~5 min + 设置 ~2.5 min + 工具 ~1 min + addon ~30s）
 
 ### 哈希获取速查表
 

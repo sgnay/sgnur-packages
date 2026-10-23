@@ -14,7 +14,7 @@
 | `sunloginclient-nixos-module` | 向日葵远程控制 NixOS 模块（`services.sunloginclient.enable`） | ✅ 可用 |
 | `velotype` | [Velotype](https://github.com/manyougz/velotype) — 基于 Rust + GPUI 的原生 Markdown 编辑器 (WYSIWYG/源码) | ✅ 可用 |
 | `goose-desktop` | [Goose Desktop](https://github.com/aaif-goose/goose) — Goose AI Agent 桌面图形应用 | ✅ 可用 |
-| `fcitx5-windinput` | [清风输入法 (WindInput)](https://windinput.com) — Fcitx5 输入法引擎（官方 deb 重打包） | ✅ 可用 |
+| `fcitx5-windinput` | [清风输入法 (WindInput)](https://windinput.com) — Fcitx5 输入法引擎（服务/设置/addon/词库全部源码构建） | ✅ 可用 |
 | `fcitx5-windinput-nixos-module` | 清风输入法 NixOS 模块（`services.fcitx5-windinput.enable`） | ✅ 可用 |
 | `fcitx5-windinput-home-module` | 清风输入法 Home Manager 模块（注册 addon + 环境变量） | ✅ 可用 |
 
@@ -130,7 +130,7 @@ nix-env -f . -qa \* --meta --xml --drv-path --show-trace
 ├── pkgs/
 │   ├── univpn/            # UniVPN 包
 │   ├── sunloginclient/    # 向日葵远程控制客户端包
-│   └── fcitx5-windinput/  # 清风输入法（deb 重打包）
+│   └── fcitx5-windinput/  # 清风输入法（源码构建）
 ├── nixos-modules/
 │   ├── default.nix        # NixOS 模块索引
 │   ├── univpn.nix         # UniVPN NixOS 模块
