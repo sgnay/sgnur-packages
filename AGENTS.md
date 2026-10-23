@@ -119,7 +119,7 @@ sgnur-packages/
   - `$out/bin/{wind_input,wind_setting}` — symlink 入口
 - **dlopen 依赖**: `fontconfig`（服务与设置）、`dbus-1` / `libxkbcommon`（设置程序）通过 `lib.getLib` 后的 `runtimeDependencies` 写入 RPATH
 - **NixOS 模块**: `nixos-modules/fcitx5-windinput.nix`（`services.fcitx5-windinput.enable`）— 用 tmpfiles 物化 `/usr/lib/windinput` 符号链接，并设置 `WIND_INPUT_SERVICE` / `WIND_INPUT_SETTING`
-- **Home Manager 模块**: `home-modules/fcitx5-windinput.nix` — 注册 `i18n.inputMethod.fcitx5.addons`，设置 session 变量
+- **Home Manager 模块**: `home-modules/fcitx5-windinput.nix` — 注册 `i18n.inputMethod.fcitx5.addons`，创建 `~/.local/state/windinput` 稳定符号链接，session 变量指向该稳定路径
 - **注册**: `default.nix` → `pkgs.callPackage ./pkgs/fcitx5-windinput { }`；`nixos-modules/default.nix`；`flake.nix` → `homeModules`
 
 ## 使用方式
@@ -289,6 +289,7 @@ ERROR: cargoHash or cargoSha256 is out of date
 - `wind_input` 按 **exe 所在目录** 查找 `data/` → 必须保持 `lib/windinput/{wind_input,data}` 布局，不能用 `install -Dm755` 拆开
 - addon 默认硬编码 `/usr/lib/windinput/{wind_input,wind_setting}`，但支持 `WIND_INPUT_SERVICE` / `WIND_INPUT_SETTING` 覆盖 → NixOS 模块用 tmpfiles 建符号链接 + 环境变量双保险
 - `.desktop` 内的 `Exec=/usr/lib/windinput/wind_setting` 需要 `substituteInPlace` 换成 store 路径
+- 升级包后：旧 `wind_input` 进程仍跑旧 store 路径，且 session 中的 `WIND_INPUT_SERVICE` 不会自动刷新 → 必须 `pkill -f /windinput/wind_input` 并重启 fcitx5；HM 模块用 `~/.local/state/windinput` 稳定符号链接规避环境变量失效
 
 ### 哈希获取速查表
 
