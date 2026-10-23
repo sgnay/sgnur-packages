@@ -117,7 +117,7 @@ sgnur-packages/
   - `$out/share/fcitx5/{addon,inputmethod}/windinput.conf` — addon / 输入法描述
   - `$out/share/{applications,icons,mime,doc,licenses}` — 桌面入口、图标、MIME、README、LICENSE
   - `$out/bin/{wind_input,wind_setting}` — symlink 入口
-- **dlopen 依赖**: `fontconfig`（服务与设置）、`dbus-1` / `libxkbcommon`（设置程序）通过 `runtimeDependencies` 写入 RPATH
+- **dlopen 依赖**: `fontconfig`（服务与设置）、`dbus-1` / `libxkbcommon`（设置程序）通过 `lib.getLib` 后的 `runtimeDependencies` 写入 RPATH
 - **NixOS 模块**: `nixos-modules/fcitx5-windinput.nix`（`services.fcitx5-windinput.enable`）— 用 tmpfiles 物化 `/usr/lib/windinput` 符号链接，并设置 `WIND_INPUT_SERVICE` / `WIND_INPUT_SETTING`
 - **Home Manager 模块**: `home-modules/fcitx5-windinput.nix` — 注册 `i18n.inputMethod.fcitx5.addons`，设置 session 变量
 - **注册**: `default.nix` → `pkgs.callPackage ./pkgs/fcitx5-windinput { }`；`nixos-modules/default.nix`；`flake.nix` → `homeModules`
@@ -273,7 +273,8 @@ ERROR: cargoHash or cargoSha256 is out of date
 
 **正确做法**：
 - 把这些库放进 `runtimeDependencies`（会写入 RPATH），而不是只放 `buildInputs`
-- 用 `patchelf --print-rpath` + `ldd` 双重确认
+- **必须用 `lib.getLib`**：`fontconfig` / `dbus` 的默认输出不含 `lib/`，直接传包名会让 RPATH 指向不存在的目录，dlopen 依然失败（症状：设置程序空 UI、候选窗无字）
+- 用 `patchelf --print-rpath` 确认目录存在，再用 `strace -f -e trace=openat` 确认 `libfontconfig.so.1` 真正被打开
 
 #### 6. Fcitx5 addon 的目录约定
 

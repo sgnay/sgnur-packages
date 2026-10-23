@@ -60,8 +60,10 @@ stdenv.mkDerivation {
   ];
 
   # wind_input / wind_setting 通过 dlopen 使用这些库（不在 DT_NEEDED 里），
-  # 必须显式写进 RPATH，否则设置程序会静默失败、候选窗字体异常。
-  runtimeDependencies = [
+  # 必须显式写进 RPATH，否则设置程序会静默失败（空 UI）、候选窗字体异常。
+  # 注意：fontconfig / dbus 的默认输出是 bin（不含 lib/），必须用 lib.getLib
+  # 取 lib 输出，否则 RPATH 指向不存在的目录，dlopen 仍然失败。
+  runtimeDependencies = lib.map lib.getLib [
     fontconfig
     dbus
     libxkbcommon
