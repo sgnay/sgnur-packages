@@ -14,9 +14,6 @@
 | `sunloginclient-nixos-module` | 向日葵远程控制 NixOS 模块（`services.sunloginclient.enable`） | ✅ 可用 |
 | `velotype` | [Velotype](https://github.com/manyougz/velotype) — 基于 Rust + GPUI 的原生 Markdown 编辑器 (WYSIWYG/源码) | ✅ 可用 |
 | `goose-desktop` | [Goose Desktop](https://github.com/aaif-goose/goose) — Goose AI Agent 桌面图形应用 | ✅ 可用 |
-| `fcitx5-windinput` | [清风输入法 (WindInput)](https://windinput.com) — Fcitx5 输入法引擎（服务/设置/addon/词库全部源码构建） | ✅ 可用 |
-| `fcitx5-windinput-nixos-module` | 清风输入法 NixOS 模块（`services.fcitx5-windinput.enable`） | ✅ 可用 |
-| `fcitx5-windinput-home-module` | 清风输入法 Home Manager 模块（注册 addon + 环境变量） | ✅ 可用 |
 
 ## 使用方式
 
@@ -38,9 +35,6 @@ nix run github:sgnay/sgnur-packages#univpn
 
 # 运行 Goose Desktop
 nix run github:sgnay/sgnur-packages#goose-desktop
-
-# 运行清风输入法设置程序
-nix run github:sgnay/sgnur-packages#fcitx5-windinput
 ```
 
 #### 作为 NixOS 模块启用
@@ -50,31 +44,11 @@ nix run github:sgnay/sgnur-packages#fcitx5-windinput
   imports = [
     inputs.sgnur-packages.nixosModules.univpn
     inputs.sgnur-packages.nixosModules.sunloginclient
-    inputs.sgnur-packages.nixosModules.fcitx5-windinput
   ];
   services.univpn.enable = true;
   services.sunloginclient.enable = true;
-  services.fcitx5-windinput.enable = true;
 }
 ```
-
-#### 清风输入法（Home Manager，推荐）
-
-Home Manager 模块会把包注册进 `i18n.inputMethod.fcitx5.addons`，并设置
-`WIND_INPUT_SERVICE` / `WIND_INPUT_SETTING`，让 addon 能找到服务与设置程序：
-
-```nix
-{
-  imports = [ inputs.sgnur-packages.homeModules.fcitx5-windinput ];
-  i18n.inputMethod = {
-    enable = true;
-    type = "fcitx5";
-  };
-}
-```
-
-安装后重启 fcitx5（`fcitx5 -rd`），在 `fcitx5-configtool` 的输入法列表中添加「清风输入法」。
-Wayland（niri）下候选窗走 `input-method-v2` popup，不要设置 `QT_IM_MODULE` / `GTK_IM_MODULE`。
 
 ### 通过 NUR
 
@@ -87,7 +61,6 @@ Wayland（niri）下候选窗走 `input-method-v2` popup，不要设置 `QT_IM_M
   environment.systemPackages = [
     pkgs.nur.repos.sgnay.univpn
     pkgs.nur.repos.sgnay.sunloginclient
-    pkgs.nur.repos.sgnay.fcitx5-windinput
   ];
 }
 ```
@@ -113,7 +86,6 @@ in {
 # 构建单个包
 nix build .#univpn
 nix build .#sunloginclient
-nix build .#fcitx5-windinput
 
 # 检查评估
 nix-env -f . -qa \* --meta --xml --drv-path --show-trace
@@ -130,15 +102,12 @@ nix-env -f . -qa \* --meta --xml --drv-path --show-trace
 ├── pkgs/
 │   ├── univpn/            # UniVPN 包
 │   ├── sunloginclient/    # 向日葵远程控制客户端包
-│   └── fcitx5-windinput/  # 清风输入法（源码构建）
+│   ├── velotype/          # Velotype Markdown 编辑器
+│   └── goose-desktop/     # Goose Desktop AI Agent
 ├── nixos-modules/
 │   ├── default.nix        # NixOS 模块索引
 │   ├── univpn.nix         # UniVPN NixOS 模块
-│   ├── sunloginclient.nix # 向日葵远程控制 NixOS 模块
-│   └── fcitx5-windinput.nix # 清风输入法 NixOS 模块
-├── home-modules/
-│   ├── default.nix        # Home Manager 模块索引
-│   └── fcitx5-windinput.nix # 清风输入法 HM 模块
+│   └── sunloginclient.nix # 向日葵远程控制 NixOS 模块
 ├── lib/                   # 库函数
 └── overlays/              # Overlays
 ```
